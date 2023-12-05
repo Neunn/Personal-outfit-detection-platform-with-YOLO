@@ -15,14 +15,24 @@ class Home_page(customtkinter.CTkFrame):
         - top_frame : สำหรับคำ Welcome
         - second_frame : เนื้อหาการใช้งาน
         """
+        # top_frame
         top_frame = customtkinter.CTkFrame(master = self,
                                            fg_color = "transparent")
         top_frame.pack(side = 'top')
-        welcom_label = customtkinter.CTkLabel(master = top_frame,
+        welcome_label = customtkinter.CTkLabel(master = top_frame,
                                        text = "Welcome",
                                        font = ("Calibri Bold", 60))
-        welcom_label.pack(side = "top", 
+        welcome_label.pack(side = "top", 
                           expand = True)
+        
+        # second_frame
+        second_frame = customtkinter.CTkFrame(master = self,
+                                              corner_radius = 10)
+        second_frame.pack(side = "top",
+                          expand = True,
+                          fill = "both",
+                          padx = 10,
+                          pady = 20)
 
 ### -> Label Page Class
 class Label_page(customtkinter.CTkFrame):
