@@ -36,7 +36,10 @@ class Home_page(customtkinter.CTkFrame):
                           pady = 20)
             # เพิ่ม text box ใน second_frame
         textbox = customtkinter.CTkTextbox(master = second_frame,
-                                           font = ("Calibri Regular", 20))
+                                           font = ("Calibri Regular", 20),
+                                           corner_radius = 20,
+                                           border_color = "black",
+                                           )
         textbox.pack(side = "top",
                      expand = True,
                      fill = "both",
@@ -44,11 +47,17 @@ class Home_page(customtkinter.CTkFrame):
                      pady = 20)
         how_to = """        
                     ยินดีตอนรับเข้าสู่โปรแกรมของเราโปรแกรมนี้คือแพลทฟอร์ม All In One คุณสามารถสร้าง Model ภายในที่เดียว
+
                     โดยขั้นตอนการใช้งานมีดังนี้
+
                     1. เตรียมข้อมูลรูปภาพของคุณที่จะใช้ Train
-                    2. อัปโหลดข้อมูลของคุณในเมนู Upload
+
+                    2. อัปโหลดข้อมูลของคุณในเมนู Upload (เป็นไฟล์ .zip)
+
                     3. ทำการ Label รูปภาพของคุณ โดยคุณสามารถกำหนด Class ได้
+
                     4. ทำการ Train โมเดลของคุณโดยสามารถปรับพารามิเตอร์ได้
+
                     5. ดูผลของโมเดลได้ที่เมนู Report
                  """
         textbox.insert(index = "0.0",
