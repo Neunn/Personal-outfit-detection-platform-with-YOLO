@@ -63,7 +63,8 @@ class Home_page(customtkinter.CTkFrame):
         textbox.insert(index = "0.0",
                        text = how_to)
         textbox.configure(state = "disabled")
-### -> Label Page Class
+
+### -> Label Page Class (ยังก่อนยังไม่ทำ)
 class Label_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color= "white")
@@ -75,6 +76,36 @@ class Label_page(customtkinter.CTkFrame):
                                        text = "Page 2",
                                        font = ("Calibri Bold", 30))
         label.pack(side = "top")
+
+### -> Upload Page Class
+class Upload_page(customtkinter.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(master = parent, fg_color = "white")
+
+        """
+        Content Inside
+        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File (วางแผนไว้ว่าเป็นไฟล์ .zip)
+        """
+        inside_frame = customtkinter.CTkFrame(master = self,
+                                              corner_radius = 20)
+        inside_frame.pack(side = "top",
+                          padx = 20,
+                          pady = 30,
+                          expand = True,
+                          fill = "both")
+        upload_button = customtkinter.CTkButton(master = inside_frame,
+                                                text = "Open Your File .zip",
+                                                compound = "top",
+                                                image = customtkinter.CTkImage(Image.open(fp = r"Icon_image/Upload_icon.png"),
+                                                                               size = (100, 100)),
+                                                font = ("Calibri Bold", 40),
+                                                text_color = "white",
+                                                fg_color = "transparent",
+                                                corner_radius = 40,
+                                                width = 500,
+                                                height = 500)
+        upload_button.pack(side = "top", expand = True)
+
 
 
 ### -> Root App
@@ -136,7 +167,7 @@ class main(customtkinter.CTk):
                                                           menu_zone_frame = self.bottom_menu_zone_frame,
                                                           icon_path = "Icon_image/Upload_white.png",
                                                           icon_path_hover = "Icon_image/Upload.png",
-                                                          page_class = Home_page)
+                                                          page_class = Upload_page)
         
 
         """
