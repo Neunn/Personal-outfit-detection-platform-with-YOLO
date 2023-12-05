@@ -2,7 +2,7 @@ import customtkinter
 import tkinter
 from tkinter import ttk
 from PIL import Image
-
+from tkinter import filedialog as fd
 
 ### -> Home Page Class
 class Home_page(customtkinter.CTkFrame):
@@ -22,7 +22,8 @@ class Home_page(customtkinter.CTkFrame):
         welcome_label = customtkinter.CTkLabel(master = top_frame,
                                        text = "Welcome",
                                        font = ("Calibri Bold", 60))
-        welcome_label.pack(side = "top", 
+        welcome_label.pack(side = "top",
+                           pady = 10, 
                           expand = True)
         
         # second_frame
@@ -34,15 +35,36 @@ class Home_page(customtkinter.CTkFrame):
                           padx = 20,
                           pady = 20)
             # เพิ่ม text box ใน second_frame
-        textbox = customtkinter.CTkTextbox(master = second_frame)
+        textbox = customtkinter.CTkTextbox(master = second_frame,
+                                           font = ("Calibri Regular", 20),
+                                           corner_radius = 20,
+                                           border_width = 2
+                                           )
         textbox.pack(side = "top",
                      expand = True,
                      fill = "both",
                      padx = 20,
                      pady = 20)
+        how_to = """        
+                    ยินดีตอนรับเข้าสู่โปรแกรมของเราโปรแกรมนี้คือแพลทฟอร์ม All In One คุณสามารถสร้าง Model ภายในที่เดียว
 
+                    โดยขั้นตอนการใช้งานมีดังนี้
 
-### -> Label Page Class
+                    1. เตรียมข้อมูลรูปภาพของคุณที่จะใช้ Train
+
+                    2. อัปโหลดข้อมูลของคุณในเมนู Upload (เป็นไฟล์ .zip)
+
+                    3. ทำการ Label รูปภาพของคุณ โดยคุณสามารถกำหนด Class ได้
+
+                    4. ทำการ Train โมเดลของคุณโดยสามารถปรับพารามิเตอร์ได้
+
+                    5. ดูผลของโมเดลได้ที่เมนู Report
+                 """
+        textbox.insert(index = "0.0",
+                       text = how_to)
+        textbox.configure(state = "disabled")
+
+### -> Label Page Class (ยังก่อนยังไม่ทำ)
 class Label_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color= "white")
@@ -55,6 +77,52 @@ class Label_page(customtkinter.CTkFrame):
                                        font = ("Calibri Bold", 30))
         label.pack(side = "top")
 
+### -> Upload Page Class
+class Upload_page(customtkinter.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(master = parent, fg_color = "white")
+
+        """
+        Content Inside
+        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File (วางแผนไว้ว่าเป็นไฟล์ .zip)
+        """
+        inside_frame = customtkinter.CTkFrame(master = self,
+                                              corner_radius = 20)
+        inside_frame.pack(side = "top",
+                          padx = 20,
+                          pady = 30,
+                          expand = True,
+                          fill = "both")
+        self.upload_button = customtkinter.CTkButton(master = inside_frame,
+                                                    text = "Open Your File .zip",
+                                                    compound = "top",
+                                                    image = customtkinter.CTkImage(Image.open(fp = r"Icon_image/Upload_icon.png"),
+                                                                                size = (100, 100)),
+                                                    font = ("Calibri Bold", 40),
+                                                    text_color = "black",
+                                                    fg_color = "transparent",
+                                                    corner_radius = 40,
+                                                    width = 500,
+                                                    height = 500,
+                                                    command = lambda : self.select_file())
+        self.upload_button.pack(side = "top", expand = True)
+        self.upload_button.bind("<Enter>", command = lambda event : self._on_enter())
+        self.upload_button.bind("<Leave>", command = lambda event : self._on_leave())
+
+    #### -> ฟังก์ชันสำหรับทำให้ตัวหนังสือเปลี่ยนสี
+    def _on_enter(self):
+        self.upload_button.configure(text_color = "white", fg_color = "#36719F")
+    def _on_leave(self):
+        self.upload_button.configure(text_color = "black", fg_color = "transparent")
+
+    #### -> ฟังก์ชันสำหรับเลือก File
+    def select_file(self):
+        filetypes = [["zip files", "*.zip"]]
+        filename = fd.askopenfilename(title = "Open File Name",
+                                      initialdir = "/",
+                                      filetypes = filetypes)
+        tkinter.messagebox.showinfo(title = "Open File Successfuly",
+                                   message = f"{filename}")
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -64,6 +132,8 @@ class main(customtkinter.CTk):
         """
         Set up our app
         """
+        self.attributes("-alpha", 0.96)
+        # pywinstyles.apply_style(window = self, style = "aero")
         self.geometry(geometry_string = f"{height}x{width}")
         self.title(string = title)
         self.configure(fg_color = "#f5f6fa")
@@ -115,7 +185,7 @@ class main(customtkinter.CTk):
                                                           menu_zone_frame = self.bottom_menu_zone_frame,
                                                           icon_path = "Icon_image/Upload_white.png",
                                                           icon_path_hover = "Icon_image/Upload.png",
-                                                          page_class = Home_page)
+                                                          page_class = Upload_page)
         
 
         """
