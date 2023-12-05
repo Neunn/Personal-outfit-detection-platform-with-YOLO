@@ -2,7 +2,7 @@ import customtkinter
 import tkinter
 from tkinter import ttk
 from PIL import Image
-
+from tkinter import filedialog as fd
 
 ### -> Home Page Class
 class Home_page(customtkinter.CTkFrame):
@@ -38,7 +38,7 @@ class Home_page(customtkinter.CTkFrame):
         textbox = customtkinter.CTkTextbox(master = second_frame,
                                            font = ("Calibri Regular", 20),
                                            corner_radius = 20,
-                                           border_color = "black",
+                                           border_width = 2
                                            )
         textbox.pack(side = "top",
                      expand = True,
@@ -93,20 +93,36 @@ class Upload_page(customtkinter.CTkFrame):
                           pady = 30,
                           expand = True,
                           fill = "both")
-        upload_button = customtkinter.CTkButton(master = inside_frame,
-                                                text = "Open Your File .zip",
-                                                compound = "top",
-                                                image = customtkinter.CTkImage(Image.open(fp = r"Icon_image/Upload_icon.png"),
-                                                                               size = (100, 100)),
-                                                font = ("Calibri Bold", 40),
-                                                text_color = "white",
-                                                fg_color = "transparent",
-                                                corner_radius = 40,
-                                                width = 500,
-                                                height = 500)
-        upload_button.pack(side = "top", expand = True)
+        self.upload_button = customtkinter.CTkButton(master = inside_frame,
+                                                    text = "Open Your File .zip",
+                                                    compound = "top",
+                                                    image = customtkinter.CTkImage(Image.open(fp = r"Icon_image/Upload_icon.png"),
+                                                                                size = (100, 100)),
+                                                    font = ("Calibri Bold", 40),
+                                                    text_color = "black",
+                                                    fg_color = "transparent",
+                                                    corner_radius = 40,
+                                                    width = 500,
+                                                    height = 500,
+                                                    command = lambda : self.select_file())
+        self.upload_button.pack(side = "top", expand = True)
+        self.upload_button.bind("<Enter>", command = lambda event : self._on_enter())
+        self.upload_button.bind("<Leave>", command = lambda event : self._on_leave())
 
+    #### -> ฟังก์ชันสำหรับทำให้ตัวหนังสือเปลี่ยนสี
+    def _on_enter(self):
+        self.upload_button.configure(text_color = "white", fg_color = "#36719F")
+    def _on_leave(self):
+        self.upload_button.configure(text_color = "black", fg_color = "transparent")
 
+    #### -> ฟังก์ชันสำหรับเลือก File
+    def select_file(self):
+        filetypes = [["zip files", "*.zip"]]
+        filename = fd.askopenfilename(title = "Open File Name",
+                                      initialdir = "/",
+                                      filetypes = filetypes)
+        tkinter.messagebox.showinfo(title = "Open File Successfuly",
+                                   message = f"{filename}")
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -116,6 +132,8 @@ class main(customtkinter.CTk):
         """
         Set up our app
         """
+        self.attributes("-alpha", 0.96)
+        # pywinstyles.apply_style(window = self, style = "aero")
         self.geometry(geometry_string = f"{height}x{width}")
         self.title(string = title)
         self.configure(fg_color = "#f5f6fa")
