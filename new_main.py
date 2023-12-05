@@ -27,12 +27,20 @@ class Home_page(customtkinter.CTkFrame):
         
         # second_frame
         second_frame = customtkinter.CTkFrame(master = self,
-                                              corner_radius = 10)
+                                              corner_radius = 20)
         second_frame.pack(side = "top",
                           expand = True,
                           fill = "both",
-                          padx = 10,
+                          padx = 20,
                           pady = 20)
+            # เพิ่ม text box ใน second_frame
+        textbox = customtkinter.CTkTextbox(master = second_frame)
+        textbox.pack(side = "top",
+                     expand = True,
+                     fill = "both",
+                     padx = 20,
+                     pady = 20)
+
 
 ### -> Label Page Class
 class Label_page(customtkinter.CTkFrame):
