@@ -103,7 +103,7 @@ class Upload_page(customtkinter.CTkFrame):
                                                     font = ("Calibri Bold", 40),
                                                     text_color = "black",
                                                     fg_color = "transparent",
-                                                    corner_radius = 40,
+                                                    corner_radius = 100,
                                                     width = 500,
                                                     height = 500,
                                                     command = lambda : self.select_file())
@@ -111,46 +111,66 @@ class Upload_page(customtkinter.CTkFrame):
         self.upload_button.bind("<Enter>", command = lambda event : self._on_enter())
         self.upload_button.bind("<Leave>", command = lambda event : self._on_leave())
 
-    #### -> ฟังก์ชันสำหรับทำให้ตัวหนังสือเปลี่ยนสี
+        #### -> ฟังก์ชันสำหรับทำให้ตัวหนังสือเปลี่ยนสี
     def _on_enter(self):
         self.upload_button.configure(text_color = "white", fg_color = "#36719F")
     def _on_leave(self):
         self.upload_button.configure(text_color = "black", fg_color = "transparent")
 
-    #### -> ฟังก์ชันสำหรับเลือก File
+        #### -> ฟังก์ชันสำหรับเลือก File
     def select_file(self):
         filetypes = [["zip files", "*.zip"]]
         zip_file_path = fd.askopenfilename(title = "Open File Name",
                                             initialdir = "/",
                                             filetypes = filetypes)
-        print(f"{zip_file_path}")
+        
         
             # ตรวจสอบว่าไฟล์ .zip มีอยู่จริงหรือไม่
-        if not os.path.exists(zip_file_path):
-            tkinter.messagebox.showerror(title = "Error", message = "ไม่พบไฟล์")
-            return None
+        if not zip_file_path:
+            tkinter.messagebox.showerror(title = "Error",
+                                         message = "Please Select A Zip File!")
+            return
         
-            # กำหนดตำแหน่งที่จะแตกไฟล์
-        current_directory = os.getcwd()
-        target_folder_name = "Image"
+            # Check ว่าใน workspace ของเรามี Folder ที่ชื่อ Image อยู่รึไม่
+        folder_name = "Image_1"
+        counter = 2
+        while os.path.exists(path = folder_name):
+            folder_name = f"Image_{counter}"
+            counter += 1
+        os.makedirs(name = folder_name)
 
+            # เปิด File Zip และ แตกไฟล์ใน Folder Image แต่ละครั้ง
+        with zipfile.ZipFile(file = zip_file_path, mode = "r") as file:
+            file.extractall(path = folder_name)
 
-            # ตรวจสอบว่า Folder นี้มีอยู่หรือไม่
-        if not os.path.exists(os.path.join(current_directory, target_folder_name)):
-            os.makedirs(os.path.join(current_directory, target_folder_name))
+        tkinter.messagebox.showinfo(title = "Succesful", 
+                                    message = "Upload Successfully")
 
-
-            # เปิดไฟล์ .zip และแตกไฟล์
-        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-            zip_ref.extractall(os.path.join(current_directory, target_folder_name))
+### -> Train Page Class
+class Train_page(customtkinter.CTkFrame):
+    def __init__(self, parent):
         
-        tkinter.messagebox.showinfo(title = "Successful", message = f"folder {current_directory} ถูกสร้าง")
+        # setup
+        super().__init__(master = parent, fg_color = "white")
 
+        """
+        Zone สำหรับ menu จะเป็น Frame ใหญ่ประกอบด้วย
+        1. Label Tools
+        2. Class โชว์ class ทั้งหมด
+        3. List ของ Image
+        """
 
-
+        menu_side = customtkinter.CTkFrame(master = self,
+                                           fg_color = "blue",
+                                           width = 265)
+        menu_side.pack(side = "left",
+                       fill = "both")
         
-    
-        
+        annotation_frame = customtkinter.CTkFrame(master = menu_side,
+                                                  fg_color = "black")
+        annotation_frame.pack(side = "top")
+
+
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -165,6 +185,7 @@ class main(customtkinter.CTk):
         self.geometry(geometry_string = f"{height}x{width}")
         self.title(string = title)
         self.configure(fg_color = "#f5f6fa")
+        self.iconbitmap(bitmap = "Icon_image/nds-website-favicon-color.ico")
 
         """
         สร้าง Frame สำหรับบริเวณเมนูและเพิ่มปุ่มเข้าไป
@@ -200,7 +221,7 @@ class main(customtkinter.CTk):
                                                         menu_zone_frame = self.top_menu_zone_frame,
                                                         icon_path = "Icon_image/Train_white.png",
                                                         icon_path_hover = "Icon_image/Train.png",
-                                                        page_class = Home_page)
+                                                        page_class = Train_page)
         
         self.report_button_menu = self.create_menu_button(name = "Report",
                                                         menu_zone_frame = self.top_menu_zone_frame,
