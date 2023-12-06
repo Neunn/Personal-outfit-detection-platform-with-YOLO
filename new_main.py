@@ -3,6 +3,8 @@ import tkinter
 from tkinter import ttk
 from PIL import Image
 from tkinter import filedialog as fd
+import os 
+import zipfile
 
 ### -> Home Page Class
 class Home_page(customtkinter.CTkFrame):
@@ -118,11 +120,37 @@ class Upload_page(customtkinter.CTkFrame):
     #### -> ฟังก์ชันสำหรับเลือก File
     def select_file(self):
         filetypes = [["zip files", "*.zip"]]
-        filename = fd.askopenfilename(title = "Open File Name",
-                                      initialdir = "/",
-                                      filetypes = filetypes)
-        tkinter.messagebox.showinfo(title = "Open File Successfuly",
-                                   message = f"{filename}")
+        zip_file_path = fd.askopenfilename(title = "Open File Name",
+                                            initialdir = "/",
+                                            filetypes = filetypes)
+        print(f"{zip_file_path}")
+        
+            # ตรวจสอบว่าไฟล์ .zip มีอยู่จริงหรือไม่
+        if not os.path.exists(zip_file_path):
+            tkinter.messagebox.showerror(title = "Error", message = "ไม่พบไฟล์")
+            return None
+        
+            # กำหนดตำแหน่งที่จะแตกไฟล์
+        current_directory = os.getcwd()
+        target_folder_name = "Image"
+
+
+            # ตรวจสอบว่า Folder นี้มีอยู่หรือไม่
+        if not os.path.exists(os.path.join(current_directory, target_folder_name)):
+            os.makedirs(os.path.join(current_directory, target_folder_name))
+
+
+            # เปิดไฟล์ .zip และแตกไฟล์
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(os.path.join(current_directory, target_folder_name))
+        
+        tkinter.messagebox.showinfo(title = "Successful", message = f"folder {current_directory} ถูกสร้าง")
+
+
+
+        
+    
+        
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -137,7 +165,6 @@ class main(customtkinter.CTk):
         self.geometry(geometry_string = f"{height}x{width}")
         self.title(string = title)
         self.configure(fg_color = "#f5f6fa")
-
 
         """
         สร้าง Frame สำหรับบริเวณเมนูและเพิ่มปุ่มเข้าไป
