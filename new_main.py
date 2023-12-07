@@ -4,7 +4,7 @@ from tkinter import ttk
 from PIL import Image
 from tkinter import filedialog as fd
 import os 
-import zipfile
+import patoolib
 
 ### -> Home Page Class
 class Home_page(customtkinter.CTkFrame):
@@ -30,7 +30,8 @@ class Home_page(customtkinter.CTkFrame):
         
         # second_frame
         second_frame = customtkinter.CTkFrame(master = self,
-                                              corner_radius = 20)
+                                              corner_radius = 20,
+                                              fg_color = "#D2DBE0")
         second_frame.pack(side = "top",
                           expand = True,
                           fill = "both",
@@ -40,7 +41,7 @@ class Home_page(customtkinter.CTkFrame):
         textbox = customtkinter.CTkTextbox(master = second_frame,
                                            font = ("Calibri Regular", 20),
                                            corner_radius = 20,
-                                           border_width = 2
+                                           border_width = 1
                                            )
         textbox.pack(side = "top",
                      expand = True,
@@ -67,7 +68,7 @@ class Home_page(customtkinter.CTkFrame):
         textbox.configure(state = "disabled")
 
 ### -> Label Page Class (ยังก่อนยังไม่ทำ)
-class Label_page(customtkinter.CTkFrame):
+class Train_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color= "white")
         
@@ -86,10 +87,11 @@ class Upload_page(customtkinter.CTkFrame):
 
         """
         Content Inside
-        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File (วางแผนไว้ว่าเป็นไฟล์ .zip)
+        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File (วางแผนไว้ว่าเป็นไฟล์ .zip, .rar)
         """
         inside_frame = customtkinter.CTkFrame(master = self,
-                                              corner_radius = 20)
+                                              corner_radius = 20,
+                                              fg_color = "#D2DBE0")
         inside_frame.pack(side = "top",
                           padx = 20,
                           pady = 30,
@@ -113,13 +115,13 @@ class Upload_page(customtkinter.CTkFrame):
 
         #### -> ฟังก์ชันสำหรับทำให้ตัวหนังสือเปลี่ยนสี
     def _on_enter(self):
-        self.upload_button.configure(text_color = "white", fg_color = "#36719F")
+        self.upload_button.configure(text_color = "white", fg_color = "#232F34")
     def _on_leave(self):
         self.upload_button.configure(text_color = "black", fg_color = "transparent")
 
         #### -> ฟังก์ชันสำหรับเลือก File
     def select_file(self):
-        filetypes = [["zip files", "*.zip"]]
+        filetypes = [["All", "*.*"], ["zip files", "*.zip"], ["rar file", "*.rar"]]
         zip_file_path = fd.askopenfilename(title = "Open File Name",
                                             initialdir = "/",
                                             filetypes = filetypes)
@@ -140,14 +142,13 @@ class Upload_page(customtkinter.CTkFrame):
         os.makedirs(name = folder_name)
 
             # เปิด File Zip และ แตกไฟล์ใน Folder Image แต่ละครั้ง
-        with zipfile.ZipFile(file = zip_file_path, mode = "r") as file:
-            file.extractall(path = folder_name)
+        patoolib.extract_archive(zip_file_path, outdir = folder_name)
 
         tkinter.messagebox.showinfo(title = "Succesful", 
                                     message = "Upload Successfully")
 
 ### -> Train Page Class
-class Train_page(customtkinter.CTkFrame):
+class Label_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         
         # setup
@@ -161,16 +162,127 @@ class Train_page(customtkinter.CTkFrame):
         """
 
         menu_side = customtkinter.CTkFrame(master = self,
-                                           fg_color = "blue",
-                                           width = 265)
+                                           fg_color = "#D2DBE0",
+                                           width = 280)
+        menu_side.pack_propagate(False)
         menu_side.pack(side = "left",
-                       fill = "both")
+                       fill = "both",
+                       padx = 10,
+                       pady = 10)
         
-        annotation_frame = customtkinter.CTkFrame(master = menu_side,
-                                                  fg_color = "black")
-        annotation_frame.pack(side = "top")
+
+        """
+            Annotation Frame (พวก rectangular, go back) sub_frame_1
+        """
+        sub_frame_1 = customtkinter.CTkFrame(master = menu_side,
+                                             fg_color = "#232F34")
+        sub_frame_1.pack(side = "top",
+                         pady = 7,
+                         padx = 7,
+                         fill = "both")
+        annotation_frame = customtkinter.CTkFrame(master = sub_frame_1,
+                                                  fg_color = "transparent")
+        annotation_frame.pack(side = "top",
+                              padx = 10,
+                              pady = 10,
+                              fill = "x")
+        hand_button = customtkinter.CTkButton(master = annotation_frame,
+                                              fg_color = "white",
+                                              bg_color = "transparent",
+                                              image = customtkinter.CTkImage(Image.open(fp = "Icon_image/Hand.png"), 
+                                                                             size = (30, 30)),
+                                              text = "",
+                                              width = 40,
+                                              height = 36)
+        hand_button.pack(side = "left", padx = 5)
+        retangular_button = customtkinter.CTkButton(master = annotation_frame,
+                                                    fg_color = "white",
+                                                    bg_color = "transparent",
+                                                    image = customtkinter.CTkImage(Image.open(fp = "Icon_image/rectangle_icon.png"),
+                                                                                   size = (30, 30)),
+                                                    text = "",
+                                                    width =40,
+                                                    height = 36)
+        retangular_button.pack(side = "left", padx = 5)
+        go_back_button = customtkinter.CTkButton(master = annotation_frame,
+                                                 fg_color = "transparent",
+                                                 bg_color = "transparent",
+                                                 image = customtkinter.CTkImage(Image.open(fp = "Icon_image/go_back.png"),
+                                                                                size = (30, 30)), 
+                                                 text = "",
+                                                 width = 40,
+                                                 height = 36)
+        go_back_button.pack(side = "left", padx = 5)
+        go_back_button = customtkinter.CTkButton(master = annotation_frame,
+                                                 fg_color = "transparent",
+                                                 bg_color = "transparent",
+                                                 image = customtkinter.CTkImage(Image.open(fp = "Icon_image/go_forward.png"),
+                                                                                size = (30, 30)), 
+                                                 text = "",
+                                                 width = 40,
+                                                 height = 36)
+        go_back_button.pack(side = "left", padx = 5)
 
 
+        """
+            Class Tag sub_frame_1
+        """
+        class_frame = customtkinter.CTkFrame(master = sub_frame_1,
+                                             fg_color = "black")
+        class_frame.pack(side = "top",
+                         padx = 7,
+                         pady = 10)
+        class_name_label = customtkinter.CTkLabel(master = class_frame,
+                                                   font = ("Calibri Bold", 18),
+                                                   text_color = "white",
+                                                   text = "CLASSES")
+        class_name_label.pack(side = "top")
+
+        class_table = ttk.Treeview(master = class_frame,
+                                   columns = ["No.", "Name"],
+                                   show = "headings")
+        class_table.pack(side = "top",
+                         padx = 5,
+                         pady = 5,
+                         expand  = True)
+        class_table.heading(column = "No.",
+                            text = "No.")
+        class_table.heading(column = "Name",
+                            text = "Name")
+        class_table.insert("", 0, values = (1, "None"))
+
+        
+        """
+            Image List sub_frame_2
+        """
+        sub_frame_2 = customtkinter.CTkFrame(master = menu_side,
+                                             fg_color = "#232F34")
+        sub_frame_2.pack(side = "top",
+                         pady = 7,
+                         padx = 7,
+                         fill = "both",
+                         expand = True)
+        border_frame = customtkinter.CTkFrame(master = sub_frame_2,
+                                              fg_color = "black")
+        border_frame.pack(expand = True, 
+                          fill = "both",
+                          padx = 7,
+                          pady = 10)
+        tree_image_list_label = customtkinter.CTkLabel(master = border_frame,
+                                                       text = "Image List",
+                                                       font = ("Calibri Bold", 18),
+                                                       text_color = "white")
+        tree_image_list_label.pack(side = "top")
+        tree_image_list = ttk.Treeview(master = border_frame,
+                                       columns = ["No.", "Check"],
+                                       show = "headings")
+        tree_image_list.pack(expand = True,
+                             fill = "both")
+        tree_image_list.heading(column = "No.",
+                                text = "No.")
+        tree_image_list.heading(column = "Check",
+                                text = "Check")
+        
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -180,7 +292,7 @@ class main(customtkinter.CTk):
         """
         Set up our app
         """
-        self.attributes("-alpha", 0.96)
+        # self.attributes("-alpha", 0.96)
         # pywinstyles.apply_style(window = self, style = "aero")
         self.geometry(geometry_string = f"{height}x{width}")
         self.title(string = title)
@@ -192,7 +304,7 @@ class main(customtkinter.CTk):
         """
         self.menu_zone = customtkinter.CTkFrame(master = self,
                                                 width = 110,
-                                                fg_color = "#273c75",
+                                                fg_color = "#344955",
                                                 bg_color = "transparent",
                                                 corner_radius = 0)
         self.menu_zone.pack_propagate(False)
