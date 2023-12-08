@@ -268,6 +268,16 @@ class Label_page(customtkinter.CTkFrame):
                           fill = "both",
                           padx = 7,
                           pady = 10)
+        
+        
+        combo_box = customtkinter.CTkComboBox(master = border_frame,
+                                                   values = ["option 1", "option 2"],
+                                                   command = lambda values: self.test_t(values))
+        combo_box
+        combo_box["state"] = 'readonly'
+        combo_box.pack(side = "top")
+
+
         tree_image_list_label = customtkinter.CTkLabel(master = border_frame,
                                                        text = "Image List",
                                                        font = ("Calibri Bold", 18),
@@ -282,7 +292,9 @@ class Label_page(customtkinter.CTkFrame):
                                 text = "No.")
         tree_image_list.heading(column = "Check",
                                 text = "Check")
-        
+    def test_t(self, values):
+        print(values)
+
 
 ### -> Root App
 class main(customtkinter.CTk):
