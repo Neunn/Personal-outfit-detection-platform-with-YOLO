@@ -270,12 +270,11 @@ class Label_page(customtkinter.CTkFrame):
                           pady = 10)
         
         
-        combo_box = customtkinter.CTkComboBox(master = border_frame,
-                                                   values = ["option 1", "option 2"],
-                                                   command = lambda values: self.test_t(values))
-        combo_box
-        combo_box["state"] = 'readonly'
-        combo_box.pack(side = "top")
+        self.combo_box = customtkinter.CTkComboBox(master = border_frame,
+                                                   state = "readonly")
+        self.get_folder()
+        self.combo_box.set(value = "Select")
+        self.combo_box.pack(side = "top")
 
 
         tree_image_list_label = customtkinter.CTkLabel(master = border_frame,
@@ -292,9 +291,17 @@ class Label_page(customtkinter.CTkFrame):
                                 text = "No.")
         tree_image_list.heading(column = "Check",
                                 text = "Check")
-    def test_t(self, values):
-        print(values)
-
+    def get_folder(self):
+        test = os.listdir()
+        folder_list = []
+        for i in test:
+            if i[:6] == "Image_":
+                folder_list.append(i)
+            else:
+                pass
+        self.combo_box.configure(values = folder_list)
+        
+        
 
 ### -> Root App
 class main(customtkinter.CTk):
