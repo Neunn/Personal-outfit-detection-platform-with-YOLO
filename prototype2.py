@@ -42,7 +42,7 @@ class ImageLabelingApp:
             image = Image.open(file_path)
             
             # คำนวณขนาดที่คงสัดส่วน
-            target_width = 800  # ขนาดที่ต้องการ
+            target_width = 1000  # ขนาดที่ต้องการ
             ratio = target_width / float(image.width)
             target_height = int(ratio * float(image.height))
             

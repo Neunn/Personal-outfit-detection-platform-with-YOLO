@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 from tkinter import filedialog as fd
 import os 
 import patoolib
-import sqlite3
+
 
 ### -> Home Page Class
 class Home_page(customtkinter.CTkFrame):
@@ -366,17 +366,31 @@ class Label_page(customtkinter.CTkFrame):
             child.destroy()
         canvas = Canvas_zone(parent = self.image_zone, 
                             image_path_selected = self.image_path_selected)
-        canvas.pack()
+        canvas.pack(expand = True,
+                    fill = "both")
         
 
 class Canvas_zone(tkinter.Canvas):   
     def __init__(self, parent, image_path_selected):
         super().__init__(master = parent)
-        image_import = ImageTk.PhotoImage(Image.open(image_path_selected), size = (640, 640))
-        self.configure(width = 640,
-                       height = 640)
-        self.create_image(0,0, image = image_import, anchor=tkinter.NW)
-        self.image = image_import
+
+        # โหลดรูปภาพและปรับขนาดลงที่ตำแหน่งที่ต้องการ
+        image = Image.open(fp = image_path_selected)
+        # คำนวณขนาดที่คงสัดส่วน
+        target_width = 640  # ขนาดที่ต้องการ
+        ratio = target_width / float(image.width)
+        target_height = int(ratio * float(image.height))
+        # ปรับขนาด
+        resized_image = image.resize((target_width, target_height), Image.LANCZOS)
+        
+        # แสดงรูปภาพบน Canvas
+        img_tk = ImageTk.PhotoImage(resized_image)
+        self.config(width = img_tk.width(), height = img_tk.height())
+
+        self.create_image(0, 0, anchor="nw", image=img_tk)
+        
+        self.image = img_tk
+
 
 
         
