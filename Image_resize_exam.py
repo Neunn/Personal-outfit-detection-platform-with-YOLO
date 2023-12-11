@@ -8,7 +8,7 @@ class ImageViewerCanvas:
         self.root.title("Image Viewer with Canvas")
 
         # สร้าง Canvas
-        self.canvas = tk.Canvas(root, width=500, height=500)
+        self.canvas = tk.Canvas(root, width=500, height=500, bg = "red")
         self.canvas.pack()
 
         # สร้างปุ่มและแท็บต่าง ๆ

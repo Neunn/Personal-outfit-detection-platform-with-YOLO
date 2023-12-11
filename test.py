@@ -375,7 +375,8 @@ class Label_page(customtkinter.CTkFrame):
             resized_image = self.resize_image(image_path, (self.image_zone.winfo_width(), self.image_zone.winfo_height()))
             
             canvas = Canvas_zone(parent=self.image_zone, image_path_selected=resized_image)
-            canvas.pack(expand=True, fill="both")
+            canvas.pack(fill = "both",
+                        expand = True)
 
     def resize_image(self, image_path, target_size):
         # Load the image
@@ -402,10 +403,10 @@ class Label_page(customtkinter.CTkFrame):
 
 class Canvas_zone(tkinter.Canvas):   
     def __init__(self, parent, image_path_selected):
-        super().__init__(master = parent)
+        super().__init__(master = parent, bg = "red")
 
 
-        self.config(width = image_path_selected.width(), height = image_path_selected.height())
+        # self.config(width = image_path_selected.width(), height = image_path_selected.height())
 
         self.create_image(0, 0, anchor="nw", image=image_path_selected)
         

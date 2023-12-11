@@ -162,6 +162,9 @@ class Label_page(customtkinter.CTkFrame):
         2. Class โชว์ class ทั้งหมด
         3. List ของ Image
         """
+        self.count = 0
+        # สร้างข้อมูลที่ใช้เก็บ bounding box
+        self.bbox_data = []
 
         menu_side = customtkinter.CTkFrame(master = self,
                                            fg_color = "#D2DBE0",
@@ -299,8 +302,6 @@ class Label_page(customtkinter.CTkFrame):
         self.tree_image_list.bind("<<TreeviewSelect>>",
                                   func = lambda event : self.select_image())
         # ตัวแปรสำหรับการลากเลือก
-        self.start_x = 0
-        self.start_y = 0
         self.rect = None
         self.img_tk = None
 
@@ -308,12 +309,17 @@ class Label_page(customtkinter.CTkFrame):
         """
             zone image
         """
-        self.image_zone = customtkinter.CTkFrame(master = self)
-        self.image_zone.pack(side = "left",
+        self.image_zone = tkinter.Canvas(master = self, bg = 'red')
+        self.image_zone.pack(side= "left",
                              expand = True,
-                             fill = "both",
-                             pady = 10,
-                             padx = 5)
+                             fill = "both")
+
+
+        self.image_zone.bind("<Motion>", func = lambda event : print(f"x = {event.x} y = {event.y}"))
+        self.image_zone.bind("<Button-1>", func = self.on_press)
+        self.image_zone.bind("<B1-Motion>", func = self.on_drag)
+        self.image_zone.bind("<ButtonRelease-1>", func = self.on_release)
+
 
 
     """
@@ -350,46 +356,72 @@ class Label_page(customtkinter.CTkFrame):
        ฟังก์ชันการเปลี่ยนรูปภาพตามรูปที่เราเลือก 
     """
     def select_image(self):
-        try:
-            selected_image = self.tree_image_list.selection()[0]
-            print(selected_image)
-            self.image_path_selected = self.combo_box.get() + "/" + self.tree_image_list.item(item = selected_image)["values"][0]
-            print(f"path = {self.image_path_selected}")
-            self.show_image()
-        except:
-            print("Change Combobox")
 
+        selected_image = self.tree_image_list.selection()[0]
+        print(selected_image)
+        self.image_path_selected = self.combo_box.get() + "/" + self.tree_image_list.item(item = selected_image)["values"][0]
+        print(f"path = {self.image_path_selected}")
+
+        self.image_zone.delete("all")
+        image = Image.open(self.image_path_selected)
+        canvas_width = self.image_zone.winfo_width()
+        canvas_height = self.image_zone.winfo_height()
+        ratio = min(canvas_width / image.width, canvas_height / image.height)
+        new_width = int(image.width * ratio)
+        new_height = int(image.height * ratio)
+
+        # ปรับขนาดของภาพ
+        resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
+        self.image = ImageTk.PhotoImage(resized_image)
+        print(f"width = {resized_image.width}, height = {resized_image.height}")
+        self.resized_image_width = resized_image.width
+        self.resized_image_height = resized_image.height
+
+        # ลบภาพเก่า (ถ้ามี)
+        self.image_zone.delete("all")
+
+        self.image_zone.create_image(0, 0, anchor=tkinter.NW, image=self.image)
+        self.image_zone.image = self.image
+
+
+    """
+        ฟังก์ชันการลากแล้วกำหนดขอบเขตการ Label
+    """
+    def on_press(self, event):
+        # เก็บตำแหน่งเริ่มต้นของการลากเลือก
+        self.start_x = self.image_zone.canvasx(event.x)
+        self.start_y = self.image_zone.canvasy(event.y)
         
-
-    def show_image(self):
-        for child in self.image_zone.winfo_children():
-            child.destroy()
-        canvas = Canvas_zone(parent = self.image_zone, 
-                            image_path_selected = self.image_path_selected)
-        canvas.pack(expand = True,
-                    fill = "both")
+        # สร้างกล่องสี่เหลี่ยมเริ่มต้น
+        self.rect = self.image_zone.create_rectangle(self.start_x, 
+                                                     self.start_y, 
+                                                     self.start_x, 
+                                                     self.start_y, 
+                                                     outline="black", 
+                                                     tags="current_rect"+f"{self.count}")
         
+    def on_drag(self, event):
+        # ปรับปรุงขนาดของกล่องสี่เหลี่ยมขณะลาก
+        cur_x = self.image_zone.canvasx(event.x)
+        cur_y = self.image_zone.canvasy(event.y)
+        self.image_zone.coords("current_rect"+f"{self.count}", self.start_x, self.start_y, cur_x, cur_y)
+    
+    def on_release(self, event):
+        # เก็บข้อมูล bounding box เมื่อปล่อยเมาส์
+        end_x = self.image_zone.canvasx(event.x)
+        end_y = self.image_zone.canvasy(event.y)
+        bbox = (min(self.start_x, end_x), min(self.start_y, end_y), max(self.start_x, end_x), max(self.start_y, end_y))
+        self.bbox_data.append(bbox)
+        self.count += 1
+        self.box_info()
 
-class Canvas_zone(tkinter.Canvas):   
-    def __init__(self, parent, image_path_selected):
-        super().__init__(master = parent, bg = "red")
-
-        # โหลดรูปภาพและปรับขนาดลงที่ตำแหน่งที่ต้องการ
-        image = Image.open(fp = image_path_selected)
-        # คำนวณขนาดที่คงสัดส่วน
-        target_width = 640  # ขนาดที่ต้องการ
-        ratio = target_width / float(image.width)
-        target_height = int(ratio * float(image.height))
-        # ปรับขนาด
-        resized_image = image.resize((target_width, target_height), Image.LANCZOS)
+    def box_info(self):
+        print(self.bbox_data)
+        # ล้างข้อมูล bounding box เก่า
+        self.bbox_data = []
         
-        # แสดงรูปภาพบน Canvas
-        img_tk = ImageTk.PhotoImage(resized_image)
-        self.config(width = img_tk.width(), height = img_tk.height())
-
-        self.create_image(0, 0, anchor="nw", image=img_tk)
         
-        self.image = img_tk
+        
 
 
 
@@ -467,6 +499,7 @@ class main(customtkinter.CTk):
         self.main_page.pack(side="left", fill="both", expand=True)
         
         self.show_frame(page_class = Home_page)
+        # self.bind("<Motion>", func = lambda event : print(f"x = {event.x} y = {event.y}"))
 
         """
         ให้มันรันวน loop ไปเรื่อยๆ
