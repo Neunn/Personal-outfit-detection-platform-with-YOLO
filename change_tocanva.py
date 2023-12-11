@@ -417,6 +417,7 @@ class Label_page(customtkinter.CTkFrame):
 
     def box_info(self):
         print("bbox_data = ",self.bbox_data)
+        
         # ล้างข้อมูล bounding box เก่า
         self.bbox_data = []
         
