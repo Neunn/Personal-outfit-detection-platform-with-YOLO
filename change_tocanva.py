@@ -315,7 +315,7 @@ class Label_page(customtkinter.CTkFrame):
                              fill = "both")
 
 
-        self.image_zone.bind("<Motion>", func = lambda event : print(f"x = {event.x} y = {event.y}"))
+        # self.image_zone.bind("<Motion>", func = lambda event : print(f"x = {event.x} y = {event.y}"))
         self.image_zone.bind("<Button-1>", func = self.on_press)
         self.image_zone.bind("<B1-Motion>", func = self.on_drag)
         self.image_zone.bind("<ButtonRelease-1>", func = self.on_release)
@@ -416,17 +416,14 @@ class Label_page(customtkinter.CTkFrame):
         self.box_info()
 
     def box_info(self):
-        print("bbox_data = ",self.bbox_data)
-        
+        print("bbox_data = ",self.bbox_data[0])
+        w = abs(self.bbox_data[0][0] - self.bbox_data[0][2])
+        h =abs(self.bbox_data[0][1] - self.bbox_data[0][3])
+        print(f"x_center = {float(int(self.bbox_data[0][0] + (w/2))/self.resized_image_width)} y_center = {float(int(self.bbox_data[0][1] + (h/2))/self.resized_image_height)}")
+        print(f"w = {float(w/self.resized_image_width)} h = {float(h/self.resized_image_height)}")
         # ล้างข้อมูล bounding box เก่า
         self.bbox_data = []
-        
-        
-        
-
-
-
-        
+            
 
 ### -> Root App
 class main(customtkinter.CTk):
