@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 from tkinter import filedialog as fd
 import os 
 import patoolib
-
+import yaml
 
 ### -> Home Page Class
 class Home_page(customtkinter.CTkFrame):
@@ -162,7 +162,6 @@ class Label_page(customtkinter.CTkFrame):
         2. Class โชว์ class ทั้งหมด
         3. List ของ Image
         """
-        self.count = 0
         # สร้างข้อมูลที่ใช้เก็บ bounding box
         self.bbox_data = []
 
@@ -243,18 +242,18 @@ class Label_page(customtkinter.CTkFrame):
                                                    text = "CLASSES")
         class_name_label.pack(side = "top")
 
-        class_table = ttk.Treeview(master = class_frame,
+        self.class_table = ttk.Treeview(master = class_frame,
                                    columns = ["No.", "Name"],
                                    show = "headings")
-        class_table.pack(side = "top",
+        self.class_table.pack(side = "top",
                          padx = 5,
                          pady = 5,
                          expand  = True)
-        class_table.heading(column = "No.",
+        self.class_table.heading(column = "No.",
                             text = "No.")
-        class_table.heading(column = "Name",
+        self.class_table.heading(column = "Name",
                             text = "Name")
-        class_table.insert("", 0, values = (1, "None"))
+        # self.class_table.insert("", 0, values = (1, "None"))
 
         
         """
@@ -312,7 +311,9 @@ class Label_page(customtkinter.CTkFrame):
         self.image_zone = tkinter.Canvas(master = self, bg = 'red')
         self.image_zone.pack(side= "left",
                              expand = True,
-                             fill = "both")
+                             fill = "both",
+                             padx = 20,
+                             pady = 20)
 
 
         # self.image_zone.bind("<Motion>", func = lambda event : print(f"x = {event.x} y = {event.y}"))
@@ -321,11 +322,9 @@ class Label_page(customtkinter.CTkFrame):
         self.image_zone.bind("<ButtonRelease-1>", func = self.on_release)
 
 
-
-    """
-        ฟังก์ชันดึงชื่อของ Folder ไปใส่ใน Combobox
-    """
+    
     def get_folder(self):
+        """ฟังก์ชันดึงชื่อของ Folder ไปใส่ใน Combobox"""
         test = os.listdir()
         self.folder_list = []
         for i in test:
@@ -335,11 +334,9 @@ class Label_page(customtkinter.CTkFrame):
                 pass
         self.combo_box.configure(values = self.folder_list)
         
-
-    """
-        ฟังก์ชันดึงข้อมูลใน Folder ตามชื่อที่เลือกใน combobox
-    """
+    
     def update_treeview(self):
+        """ฟังก์ชันดึงข้อมูลใน Folder ตามชื่อที่เลือกใน combobox"""
         # clear ทุก Item ใน treeview
         print("test")
         for item in self.tree_image_list.get_children():
@@ -351,12 +348,12 @@ class Label_page(customtkinter.CTkFrame):
                 if file.lower().endswith(('.png', '.jpg', '.jpeg')):
                     self.tree_image_list.insert('', 'end', value = (file,))
 
-        
-    """
-       ฟังก์ชันการเปลี่ยนรูปภาพตามรูปที่เราเลือก 
-    """
-    def select_image(self):
 
+    def select_image(self):
+        """
+        ฟังก์ชันการเปลี่ยนรูปภาพตามรูปที่เราเลือก 
+        """
+        self.count = 0
         selected_image = self.tree_image_list.selection()[0]
         print(selected_image)
         self.image_path_selected = self.combo_box.get() + "/" + self.tree_image_list.item(item = selected_image)["values"][0]
@@ -383,11 +380,10 @@ class Label_page(customtkinter.CTkFrame):
         self.image_zone.create_image(0, 0, anchor=tkinter.NW, image=self.image)
         self.image_zone.image = self.image
 
-
-    """
-        ฟังก์ชันการลากแล้วกำหนดขอบเขตการ Label
-    """
     def on_press(self, event):
+        """
+        ฟังก์ชันการลากแล้วกำหนดขอบเขตการ Label
+        """
         # เก็บตำแหน่งเริ่มต้นของการลากเลือก
         self.start_x = self.image_zone.canvasx(event.x)
         self.start_y = self.image_zone.canvasy(event.y)
@@ -416,14 +412,58 @@ class Label_page(customtkinter.CTkFrame):
         self.box_info()
 
     def box_info(self):
+        """
+            Yolo Format
+                xmin: top-left x coordinate,
+                ymin: top-left y coordinate,
+                w: bounding box width,
+                h: bounding box height,
+                w_img: image width,
+                h_img: image height
+        """
         print("bbox_data = ",self.bbox_data[0])
         w = abs(self.bbox_data[0][0] - self.bbox_data[0][2])
         h =abs(self.bbox_data[0][1] - self.bbox_data[0][3])
         print(f"x_center = {float(int(self.bbox_data[0][0] + (w/2))/self.resized_image_width)} y_center = {float(int(self.bbox_data[0][1] + (h/2))/self.resized_image_height)}")
         print(f"w = {float(w/self.resized_image_width)} h = {float(h/self.resized_image_height)}")
+        self.tag_select()
         # ล้างข้อมูล bounding box เก่า
         self.bbox_data = []
-            
+
+
+    def insert_values(self):
+        pass
+
+    def tag_select(self):
+        """หน้าต่าง top level เวลาลาก box เสร็จ"""
+
+        # setup
+        self.top = customtkinter.CTkToplevel()
+        top_width = 300
+        top_height = 200
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width/2) - (top_width/2)
+        y = (screen_height/2) - (top_height/2)
+        self.top.title(string = "Tag Select")
+        self.top.after(250, lambda : self.top.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
+        self.top.geometry(geometry_string = f"{top_width}x{top_height}+{int(x)}+{int(y)}")
+        self.top.config(bg = "white")
+        self.top.resizable(False, False)
+        self.top.grab_set()
+        
+        # Widget
+        label = customtkinter.CTkLabel(master = self.top,
+                                       font = ("Calibri Bold", 18))
+        label.pack(fill = "x")
+        
+        self.select_tag_combo_box = ttk.Combobox(master = self.top,
+                                                 state = "readonly",
+                                                 height = 20)
+        self.select_tag_combo_box.set(value = "Select")
+        self.select_tag_combo_box.pack(pady = 10)
+        
+        
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -432,10 +472,9 @@ class main(customtkinter.CTk):
 
         """
         Set up our app
-        """
-        # self.attributes("-alpha", 0.96)
+        """ 
         # pywinstyles.apply_style(window = self, style = "aero")
-        self.geometry(geometry_string = f"{height}x{width}")
+        self.geometry(geometry_string = f"{height}x{width}+0+0")
         self.title(string = title)
         self.configure(fg_color = "#f5f6fa")
         self.iconbitmap(bitmap = "Icon_image/nds-website-favicon-color.ico")
