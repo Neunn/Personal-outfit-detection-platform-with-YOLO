@@ -462,6 +462,59 @@ class Label_page(customtkinter.CTkFrame):
                                                  height = 20)
         self.select_tag_combo_box.set(value = "Select")
         self.select_tag_combo_box.pack(pady = 10)
+        self.entry_widget = customtkinter.CTkEntry(master = self.top,
+                                                   width = 140,
+                                                   bg_color = "white",
+                                                   fg_color = "white")
+        self.entry_widget.pack(pady = 5)
+        self.enter_button_widget = customtkinter.CTkButton(master = self.top,
+                                                           text = "Enter",
+                                                           bg_color = "white",
+                                                           command = lambda : self.read_file())
+        self.enter_button_widget.pack()
+        self.top.bind("<Return>", func = lambda event: self.read_file())
+
+
+    def read_file(self):
+        if os.path.exists(path = f"{self.combo_box.get()}/data.yaml"):
+            print("มี Path")
+            print(f"{self.select_tag_combo_box.get()}")
+            with open(f"{self.combo_box.get()}/data.yaml", "r") as file:
+                test = yaml.safe_load(file)
+            print(test)
+        else:
+            ## train folder
+            if os.path.exists(path = f"{self.combo_box.get()}/train"):
+                train_folder = f"{self.combo_box.get()}/train"
+            else:
+                os.makedirs(name = f"{self.combo_box.get()}/train")
+                train_folder = f"{self.combo_box.get()}/train"
+
+            ## test folder
+            if os.path.exists(path = f"{self.combo_box.get()}/test"):
+                test_folder = f"{self.combo_box.get()}/test"
+            else:
+                os.makedirs(name = f"{self.combo_box.get()}/test")
+                test_folder = f"{self.combo_box.get()}/test"
+
+            ## val folder
+            if os.path.exists(path = f"{self.combo_box.get()}/val"):
+                val_folder = f"{self.combo_box.get()}/val"
+            else:
+                os.makedirs(name = f"{self.combo_box.get()}/val")
+                val_folder = f"{self.combo_box.get()}/val"
+            
+            nc = 0
+            names = []
+
+            data = {"train" : train_folder,
+                    "val" : val_folder,
+                    "test" : test_folder,
+                    "nc" : nc,
+                    "names" : names}
+
+            with open(file = f"{self.combo_box.get()}/data.yaml", mode = "w") as file:
+                yaml.dump(data, file)
         
         
 
