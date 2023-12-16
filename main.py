@@ -77,7 +77,7 @@ class Train_page(customtkinter.CTkFrame):
         Content Inside
         """
         label = customtkinter.CTkLabel(master = self,
-                                       text = "Page 2",
+                                       text = "Training Page",
                                        font = ("Calibri Bold", 30))
         label.pack(side = "top")
 
@@ -253,8 +253,6 @@ class Label_page(customtkinter.CTkFrame):
                             text = "No.")
         self.class_table.heading(column = "Name",
                             text = "Name")
-        # self.class_table.insert("", 0, values = (1, "None"))
-
         
         """
             Image List sub_frame_2
@@ -300,6 +298,8 @@ class Label_page(customtkinter.CTkFrame):
                                 text = "Check")
         self.tree_image_list.bind("<<TreeviewSelect>>",
                                   func = lambda event : self.select_image())
+
+
         # ตัวแปรสำหรับการลากเลือก
         self.rect = None
         self.img_tk = None
@@ -322,7 +322,23 @@ class Label_page(customtkinter.CTkFrame):
         self.image_zone.bind("<ButtonRelease-1>", func = self.on_release)
 
 
-    
+    def update_classtree(self):
+        """ฟังก์ชันดึงข้อมูลจาก file data.yaml"""
+        if os.path.exists(path = f"{self.combo_box.get()}/data.yaml"):
+
+            for item in self.class_table.get_children():
+                self.class_table.delete(item)
+
+            with open(file = f"{self.combo_box.get()}/data.yaml", mode = "r") as file:
+                data = yaml.safe_load(file)
+
+            for i,j in enumerate(data["names"]):
+                self.class_table.insert("", 0, values = (i, j))
+
+        else:
+            for item in self.class_table.get_children():
+                self.class_table.delete(item)
+
     def get_folder(self):
         """ฟังก์ชันดึงชื่อของ Folder ไปใส่ใน Combobox"""
         test = os.listdir()
@@ -337,11 +353,14 @@ class Label_page(customtkinter.CTkFrame):
     
     def update_treeview(self):
         """ฟังก์ชันดึงข้อมูลใน Folder ตามชื่อที่เลือกใน combobox"""
+        # อัปเดตตารางคลาส
+        self.update_classtree()
+
         # clear ทุก Item ใน treeview
-        print("test")
         for item in self.tree_image_list.get_children():
             self.tree_image_list.delete(item)
         print(self.combo_box.get())
+        print("")
         # เพิ่ม Image ใน 
         for root, dirs, files in os.walk(self.combo_box.get()):
             for file in files:
@@ -356,8 +375,10 @@ class Label_page(customtkinter.CTkFrame):
         self.count = 0
         selected_image = self.tree_image_list.selection()[0]
         print(selected_image)
+        print("")
         self.image_path_selected = self.combo_box.get() + "/" + self.tree_image_list.item(item = selected_image)["values"][0]
         print(f"path = {self.image_path_selected}")
+        print("")
 
         self.image_zone.delete("all")
         image = Image.open(self.image_path_selected)
@@ -421,23 +442,28 @@ class Label_page(customtkinter.CTkFrame):
                 w_img: image width,
                 h_img: image height
         """
+        print("")
         print("bbox_data = ",self.bbox_data[0])
         w = abs(self.bbox_data[0][0] - self.bbox_data[0][2])
         h =abs(self.bbox_data[0][1] - self.bbox_data[0][3])
-        print(f"x_center = {float(int(self.bbox_data[0][0] + (w/2))/self.resized_image_width)} y_center = {float(int(self.bbox_data[0][1] + (h/2))/self.resized_image_height)}")
-        print(f"w = {float(w/self.resized_image_width)} h = {float(h/self.resized_image_height)}")
+        self.x_center = float(int(self.bbox_data[0][0] + (w/2))/self.resized_image_width)
+        self.y_center = float(int(self.bbox_data[0][1] + (h/2))/self.resized_image_height)
+        self.w = float(w/self.resized_image_width)
+        self.h = float(h/self.resized_image_height)
+        print("")
+        print(f"x_center = {self.x_center} y_center = {self.y_center}")
+        print(f"w = {self.w} h = {self.h}")
+        print("")
         self.tag_select()
         # ล้างข้อมูล bounding box เก่า
         self.bbox_data = []
 
 
-    def insert_values(self):
-        pass
-
     def tag_select(self):
         """หน้าต่าง top level เวลาลาก box เสร็จ"""
 
         # setup
+        
         self.top = customtkinter.CTkToplevel()
         top_width = 300
         top_height = 200
@@ -462,61 +488,206 @@ class Label_page(customtkinter.CTkFrame):
                                                  height = 20)
         self.select_tag_combo_box.set(value = "Select")
         self.select_tag_combo_box.pack(pady = 10)
+
+        # if os.path.exists(path = f"{self.combo_box.get()}/data.yaml"):
+        #     with open(f"{self.combo_box.get()}/data.yaml", "r") as file:
+        #         data = yaml.safe_load()
+        #     self.select_tag_combo_box.configure(values = data["names"])
+
+        self.entry_widget_var = tkinter.StringVar()
         self.entry_widget = customtkinter.CTkEntry(master = self.top,
                                                    width = 140,
                                                    bg_color = "white",
-                                                   fg_color = "white")
+                                                   fg_color = "white",
+                                                   textvariable = self.entry_widget_var)
         self.entry_widget.pack(pady = 5)
-        self.enter_button_widget = customtkinter.CTkButton(master = self.top,
-                                                           text = "Enter",
-                                                           bg_color = "white",
-                                                           command = lambda : self.read_file())
-        self.enter_button_widget.pack()
-        self.top.bind("<Return>", func = lambda event: self.read_file())
 
+        self.check_yaml_file()
 
-    def read_file(self):
+        self.select_tag_combo_box.bind("<<ComboboxSelected>>", func = lambda event : self.entry_widget_var.set(""))
+        self.entry_widget.bind("<Key>", command = lambda event : self.select_tag_combo_box.set(value = "Select"))
+
+        self.top.bind("<Return>", func = lambda event : self.insert_tag())
+    
+    def check_yaml_file(self):
         if os.path.exists(path = f"{self.combo_box.get()}/data.yaml"):
-            print("มี Path")
-            print(f"{self.select_tag_combo_box.get()}")
-            with open(f"{self.combo_box.get()}/data.yaml", "r") as file:
-                test = yaml.safe_load(file)
-            print(test)
+            print("")
+            print(f"พบเจอ file data.yaml path : {self.combo_box.get()}/data.yaml")
+            print("")
+            with open(file = f"{self.combo_box.get()}/data.yaml", mode = "r") as read_file:
+                data = yaml.safe_load(read_file)
+                self.select_tag_combo_box.configure(values = data["names"])
+            pass
         else:
-            ## train folder
-            if os.path.exists(path = f"{self.combo_box.get()}/train"):
-                train_folder = f"{self.combo_box.get()}/train"
-            else:
-                os.makedirs(name = f"{self.combo_box.get()}/train")
-                train_folder = f"{self.combo_box.get()}/train"
-
-            ## test folder
-            if os.path.exists(path = f"{self.combo_box.get()}/test"):
-                test_folder = f"{self.combo_box.get()}/test"
-            else:
-                os.makedirs(name = f"{self.combo_box.get()}/test")
-                test_folder = f"{self.combo_box.get()}/test"
-
-            ## val folder
-            if os.path.exists(path = f"{self.combo_box.get()}/val"):
-                val_folder = f"{self.combo_box.get()}/val"
-            else:
-                os.makedirs(name = f"{self.combo_box.get()}/val")
-                val_folder = f"{self.combo_box.get()}/val"
-            
-            nc = 0
-            names = []
-
-            data = {"train" : train_folder,
-                    "val" : val_folder,
-                    "test" : test_folder,
-                    "nc" : nc,
-                    "names" : names}
-
             with open(file = f"{self.combo_box.get()}/data.yaml", mode = "w") as file:
-                yaml.dump(data, file)
+                yaml.dump({"names" : [], "nc" : 0},file)
+                file.close()
+    
+
+
+    def insert_tag(self):
+
+        # 0. entry ครั้งแรกตั้งเงื่อนไข
+        # 1. เลือกคือการเลือกของที่มีอยู่แล้วสร้างไฟล์ใหม่
+        # 2. entry คือการสร้าง label ใหม่แล้วสร้างไฟล์แท็ก Label
+        # 3. หากเลือกต้องเคลียค่า entry
+
+        path = f"{self.combo_box.get()}/data.yaml"
+        im_select_path = os.path.splitext(self.image_path_selected)[0]
+        print("new path = ", im_select_path)
+
+        with open(file = path, mode = "r") as read_file:
+            data = yaml.safe_load(read_file)
+        print("data =", data)
+
+        if self.select_tag_combo_box.get() == "Select" and self.entry_widget_var.get() == "":
+            tkinter.messagebox.showerror(title = "Error",
+                                         message = "กรุณาเลือก/เพิ่ม Tag")
+            return
+
+        if self.select_tag_combo_box.get() != "Select":
+            print(f"Select Tag = {self.select_tag_combo_box.get()}")
+            if os.path.exists(path = f"{im_select_path}.txt"):
+                print("มีไฟล์ txt อยู่แล้ว")
+                with open(file = f"{im_select_path}.txt", mode = "a") as read_file:
+
+                    with open(file = path, mode = "r") as yaml_read_file:
+                        data_read = yaml.safe_load(yaml_read_file)
+                        
+                        for i,j in enumerate(data_read["names"]):
+                            if j == self.select_tag_combo_box.get():
+                                index = i
+                                break
+
+                    line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                    read_file.write(line)
+                self.update_classtree()
+                self.top.destroy()
+
+            else:
+                print("ไม่มีไฟล์สร้างใหม่")
+                with open(file = f"{im_select_path}.txt", mode = "w") as write_file:
+
+                    with open(file = path, mode = "r") as yaml_read_file:
+                        data_read = yaml.safe_load(yaml_read_file)
+
+                        for i,j in enumerate(data_read["names"]):
+                            if j == self.select_tag_combo_box.get():
+                                index = i
+                                break
+
+                    line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                    write_file.write(line)
+                self.update_classtree()
+                self.top.destroy()
+
+
+        elif self.entry_widget_var.get() != "":
+            data["names"].append(self.entry_widget_var.get())
+            data["nc"] += 1
+
+            if os.path.exists(path = f"{im_select_path}.txt"):
+                with open(file = path, mode = "w") as write_file:
+                    yaml.dump(data, write_file)
+                with open(file = path, mode = "r") as read_file:
+                    data_read = yaml.safe_load(read_file)
+                    for i,j in enumerate(data_read["names"]):
+                        if j == self.entry_widget_var.get():
+                            index = i
+                            break
+
+                with open(file = f"{im_select_path}.txt", mode = "a") as write_file:
+                    line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                    write_file.write(line)
+                    
+            else:
+                with open(file = path, mode = "w") as write_file:
+                    yaml.dump(data, write_file)
+                with open(file = path, mode = "r") as read_file:
+                    data_read = yaml.safe_load(read_file)
+                    for i,j in enumerate(data_read["names"]):
+                        if j == self.entry_widget_var.get():
+                            index = i
+                            break
+
+
+                    with open(f"{im_select_path}.txt", mode = "w") as txt_file:
+                        line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                        txt_file.write(line)
+            self.update_classtree()
+            self.top.destroy()
         
+
+            
         
+
+
+
+
+
+        # with open(file = path, mode = "r") as read_file:
+        #     data = yaml.safe_load(read_file)
+        #     data["names"] = [name]
+        #     with open(file = path, mode = "w") as write_file:
+        #         yaml.dump(data, write_file)
+        #         write_file.close()
+        #     read_file.close()
+
+
+        # if self.select_tag_combo_box.get() == "Select" and self.entry_widget_var.get() == "":
+        #     tkinter.messagebox.showerror(title = "Error",
+        #                                 message = "กรุณาเลือก/เพิ่ม Tag")
+        #     return
+        
+        # elif self.select_tag_combo_box.get() != "Select":
+        #     tag_name = self.select_tag_combo_box.get()
+        #     print(f"tag_name = {tag_name}")
+        #     if os.path.exists(f"{self.image_path_selected[:-4]}.txt"):
+        #         os.makedirs(f"{self.image_path_selected[:-4]}.txt")
+        #         # print(f"{self.image_path_selected[:-4]}.txt")
+        #     else:
+        #         print("ไม่มี")
+
+        #     self.top.destroy()
+
+        # else:
+        #     print(f"Entry = {self.entry_widget_var.get()}")
+
+        #     with open(f"{self.combo_box.get()}/data.yaml", "w+") as file:
+        #         data = yaml.safe_load(file)
+
+        #         for i in data.keys():
+        #             if i == "names":
+        #                 check = True
+        #                 break
+        #             else:
+        #                 check = False
+
+        #         if check:
+        #             data["names"].append(self.entry_widget_var.get())
+        #             data["nc"] += 1
+        #         else:
+        #             data["names"] = [self.entry_widget_var.get()]
+        #             data["nc"] = 1
+
+        #         yaml.safe_dump(data, file)
+                
+        #         file.close()
+
+        #     self.top.destroy()
+        
+class Report_page(customtkinter.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(master = parent, fg_color = "white")
+
+        """
+        content inside
+        """
+        label = customtkinter.CTkLabel(master = self,
+                                       text = "Report Page",
+                                       font = ("Calibri Bold", 30))
+        label.pack()
+
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -572,7 +743,7 @@ class main(customtkinter.CTk):
                                                         menu_zone_frame = self.top_menu_zone_frame,
                                                         icon_path = "Icon_image/paper_white.png",
                                                         icon_path_hover = "Icon_image/paper.png",
-                                                        page_class = Label_page)
+                                                        page_class = Report_page)
             #ปุ่ม upload
         self.upload_button_menu = self.create_menu_button(name = "Upload",
                                                           menu_zone_frame = self.bottom_menu_zone_frame,
