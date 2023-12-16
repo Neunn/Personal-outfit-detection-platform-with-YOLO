@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 5
+names: ['Test', 'Vest', 'head', 'helmet', 'person']
+
+roboflow:
+  workspace: kmitl-y8ewu
+  project: hard-hat-sample-boqph
+  version: 5
+  license: Public Domain
+  url: https://app.roboflow.com/kmitl-y8ewu/hard-hat-sample-boqph/5

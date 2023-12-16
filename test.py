@@ -1,7 +1,7 @@
 import customtkinter
 import tkinter
 from tkinter import ttk
-from PIL import Image
+from PIL import Image, ImageTk
 from tkinter import filedialog as fd
 import os 
 import patoolib
@@ -67,7 +67,7 @@ class Home_page(customtkinter.CTkFrame):
                        text = how_to)
         textbox.configure(state = "disabled")
 
-### -> Label Page Class (ยังก่อนยังไม่ทำ)
+### -> Train Page Class
 class Train_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color= "white")
@@ -147,12 +147,13 @@ class Upload_page(customtkinter.CTkFrame):
         tkinter.messagebox.showinfo(title = "Succesful", 
                                     message = "Upload Successfully")
 
-### -> Train Page Class
+### -> Train Page Class (กำลังทำ)
 class Label_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         
         # setup
-        super().__init__(master = parent, fg_color = "white")
+        super().__init__(master = parent, 
+                         fg_color = "white")
 
         """
         Zone สำหรับ menu จะเป็น Frame ใหญ่ประกอบด้วย
@@ -268,21 +269,149 @@ class Label_page(customtkinter.CTkFrame):
                           fill = "both",
                           padx = 7,
                           pady = 10)
+        
+        
+        self.combo_box = ttk.Combobox(master = border_frame,
+                                      state = "readonly",
+                                      height = 10)
+        self.get_folder()
+        self.combo_box.set(value = "Select")
+        self.combo_box.pack(side = "top")
+        self.combo_box.bind("<<ComboboxSelected>>", 
+                            func =  lambda event: self.update_treeview())
+
+
         tree_image_list_label = customtkinter.CTkLabel(master = border_frame,
                                                        text = "Image List",
                                                        font = ("Calibri Bold", 18),
                                                        text_color = "white")
         tree_image_list_label.pack(side = "top")
-        tree_image_list = ttk.Treeview(master = border_frame,
+        self.tree_image_list = ttk.Treeview(master = border_frame,
                                        columns = ["No.", "Check"],
                                        show = "headings")
-        tree_image_list.pack(expand = True,
+        self.tree_image_list.pack(expand = True,
                              fill = "both")
-        tree_image_list.heading(column = "No.",
+        self.tree_image_list.heading(column = "No.",
                                 text = "No.")
-        tree_image_list.heading(column = "Check",
+        self.tree_image_list.heading(column = "Check",
                                 text = "Check")
+        self.tree_image_list.bind("<<TreeviewSelect>>",
+                                  func = lambda event : self.select_image())
+        # ตัวแปรสำหรับการลากเลือก
+        self.start_x = 0
+        self.start_y = 0
+        self.rect = None
+        self.img_tk = None
+
         
+        """
+            zone image
+        """
+        self.image_zone = customtkinter.CTkFrame(master = self)
+        self.image_zone.pack(side = "left",
+                             expand = True,
+                             fill = "both",
+                             pady = 10,
+                             padx = 5)
+
+
+    """
+        ฟังก์ชันดึงชื่อของ Folder ไปใส่ใน Combobox
+    """
+    def get_folder(self):
+        test = os.listdir()
+        self.folder_list = []
+        for i in test:
+            if i[:6] == "Image_":
+                self.folder_list.append(i)
+            else:
+                pass
+        self.combo_box.configure(values = self.folder_list)
+        
+
+    """
+        ฟังก์ชันดึงข้อมูลใน Folder ตามชื่อที่เลือกใน combobox
+    """
+    def update_treeview(self):
+        # clear ทุก Item ใน treeview
+        print("test")
+        for item in self.tree_image_list.get_children():
+            self.tree_image_list.delete(item)
+        print(self.combo_box.get())
+        # เพิ่ม Image ใน 
+        for root, dirs, files in os.walk(self.combo_box.get()):
+            for file in files:
+                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    self.tree_image_list.insert('', 'end', value = (file,))
+
+        
+    """
+       ฟังก์ชันการเปลี่ยนรูปภาพตามรูปที่เราเลือก 
+    """
+    def select_image(self):
+
+        selected_image = self.tree_image_list.selection()[0]
+        print(selected_image)
+        self.image_path_selected = self.combo_box.get() + "/" + self.tree_image_list.item(item = selected_image)["values"][0]
+        print(f"path = {self.image_path_selected}")
+        self.show_image()
+
+
+        
+    """
+       ฟังก์ชันเกี่ยวกับรูปภาพ
+    """
+    def show_image(self):
+        for child in self.image_zone.winfo_children():
+            child.destroy()
+        selected_image = self.tree_image_list.selection()
+        
+        if selected_image:
+            selected_image = selected_image[0]
+            image_filename = self.tree_image_list.item(item=selected_image)["values"][0]
+            image_path = os.path.join(self.combo_box.get(), image_filename)
+            
+            # Resize the image to fit within the self.image_zone dimensions
+            resized_image = self.resize_image(image_path, (self.image_zone.winfo_width(), self.image_zone.winfo_height()))
+            
+            canvas = Canvas_zone(parent=self.image_zone, image_path_selected=resized_image)
+            canvas.pack(fill = "both",
+                        expand = True)
+
+    def resize_image(self, image_path, target_size):
+        # Load the image
+        image = Image.open(fp=image_path)
+
+        # Calculate the aspect ratio
+        aspect_ratio = image.width / image.height
+
+        # Calculate the target size maintaining the aspect ratio
+        target_width, target_height = target_size
+        if target_width / target_height > aspect_ratio:
+            target_width = int(target_height * aspect_ratio)
+        else:
+            target_height = int(target_width / aspect_ratio)
+
+        # Resize the image
+        resized_image = image.resize((target_width, target_height), Image.LANCZOS)
+
+        # Convert the image to PhotoImage
+        img_tk = ImageTk.PhotoImage(resized_image)
+
+        return img_tk
+        
+
+class Canvas_zone(tkinter.Canvas):   
+    def __init__(self, parent, image_path_selected):
+        super().__init__(master = parent, bg = "red")
+
+
+        # self.config(width = image_path_selected.width(), height = image_path_selected.height())
+
+        self.create_image(0, 0, anchor="nw", image=image_path_selected)
+        
+        self.image = image_path_selected
+
 
 ### -> Root App
 class main(customtkinter.CTk):
@@ -383,10 +512,13 @@ class main(customtkinter.CTk):
 
     #### -> ฟังก์ชันสำหรับทำให้ปุ่มเปลี่ยนสี
     def _on_enter(self, button, icon_path_hover):
-        button.configure(text_color= "black", fg_color = "#fbc531", 
+        button.configure(text_color= "black", 
+                         fg_color = "#fbc531", 
                          image = customtkinter.CTkImage(Image.open(fp = icon_path_hover), size = (70, 48)))
+        
     def _on_leave(self, button, icon_path):
-        button.configure(text_color= "white", fg_color = "transparent", 
+        button.configure(text_color = "white", 
+                         fg_color = "transparent", 
                          image = customtkinter.CTkImage(Image.open(fp = icon_path), size = (70, 48)))
 
     #### -> ฟังก์ชันสำหรับเปลี่ยนหน้า
@@ -394,8 +526,9 @@ class main(customtkinter.CTk):
         for child in self.main_page.winfo_children():
             child.destroy()
 
-        frame = page_class(parent=self.main_page)
-        frame.pack(fill="both", expand=True)
+        frame = page_class(parent = self.main_page)
+        frame.pack(fill = "both",
+                   expand = True)
 
 ### -> Run Application app
 main(title = "Personal outfit detection platform with YOLO", 
