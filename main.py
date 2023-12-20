@@ -253,6 +253,7 @@ class Label_page(customtkinter.CTkFrame):
                             text = "No.")
         self.class_table.heading(column = "Name",
                             text = "Name")
+        self.class_table.bind("<<TreeviewSelect>>", func = lambda event : self.delete_tag())
         
         """
             Image List sub_frame_2
@@ -523,6 +524,23 @@ class Label_page(customtkinter.CTkFrame):
                 yaml.dump({"names" : [], "nc" : 0},file)
                 file.close()
     
+    def delete_tag(self):
+        # เวลาเรารันฟังก์ชันนี้แล้วจะลบที่ class tag และ run ในแต่ละ path ที่เป็นไฟล์ txt จากนั้้นก็ลบ class tag นั้นๆ
+        for roots, dire, files in os.walk(self.combo_box.get()):
+            print(f"roots = {roots}")
+            for i in files:
+                print(f"root image = {roots}/{i}")
+
+    def draw_box_label(self):
+        image_path = os.path.splitext(self.image_path_selected)[0]
+        if os.path.exists(path = image_path + ".txt"):
+            with open(file = image_path + ".txt", mode = "r") as read_file:
+                data = read_file.readlines()
+                print(f"data = {data}")
+        else:
+            pass
+            
+
 
 
     def insert_tag(self):
@@ -533,8 +551,8 @@ class Label_page(customtkinter.CTkFrame):
         # 3. หากเลือกต้องเคลียค่า entry
 
         path = f"{self.combo_box.get()}/data.yaml"
-        im_select_path = os.path.splitext(self.image_path_selected)[0]
-        print("new path = ", im_select_path)
+        image_path = os.path.splitext(self.image_path_selected)[0]
+        print("new path = ", image_path)
 
         with open(file = path, mode = "r") as read_file:
             data = yaml.safe_load(read_file)
@@ -547,9 +565,9 @@ class Label_page(customtkinter.CTkFrame):
 
         if self.select_tag_combo_box.get() != "Select":
             print(f"Select Tag = {self.select_tag_combo_box.get()}")
-            if os.path.exists(path = f"{im_select_path}.txt"):
+            if os.path.exists(path = f"{image_path}.txt"):
                 print("มีไฟล์ txt อยู่แล้ว")
-                with open(file = f"{im_select_path}.txt", mode = "a") as read_file:
+                with open(file = f"{image_path}.txt", mode = "a") as read_file:
 
                     with open(file = path, mode = "r") as yaml_read_file:
                         data_read = yaml.safe_load(yaml_read_file)
@@ -566,7 +584,7 @@ class Label_page(customtkinter.CTkFrame):
 
             else:
                 print("ไม่มีไฟล์สร้างใหม่")
-                with open(file = f"{im_select_path}.txt", mode = "w") as write_file:
+                with open(file = f"{image_path}.txt", mode = "w") as write_file:
 
                     with open(file = path, mode = "r") as yaml_read_file:
                         data_read = yaml.safe_load(yaml_read_file)
@@ -586,7 +604,7 @@ class Label_page(customtkinter.CTkFrame):
             data["names"].append(self.entry_widget_var.get())
             data["nc"] += 1
 
-            if os.path.exists(path = f"{im_select_path}.txt"):
+            if os.path.exists(path = f"{image_path}.txt"):
                 with open(file = path, mode = "w") as write_file:
                     yaml.dump(data, write_file)
                 with open(file = path, mode = "r") as read_file:
@@ -596,7 +614,7 @@ class Label_page(customtkinter.CTkFrame):
                             index = i
                             break
 
-                with open(file = f"{im_select_path}.txt", mode = "a") as write_file:
+                with open(file = f"{image_path}.txt", mode = "a") as write_file:
                     line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
                     write_file.write(line)
                     
@@ -611,7 +629,7 @@ class Label_page(customtkinter.CTkFrame):
                             break
 
 
-                    with open(f"{im_select_path}.txt", mode = "w") as txt_file:
+                    with open(f"{image_path}.txt", mode = "w") as txt_file:
                         line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
                         txt_file.write(line)
             self.update_classtree()
