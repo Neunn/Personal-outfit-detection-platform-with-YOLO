@@ -400,6 +400,7 @@ class Label_page(customtkinter.CTkFrame):
 
         self.image_zone.create_image(0, 0, anchor=tkinter.NW, image=self.image)
         self.image_zone.image = self.image
+        self.show_old_label()
 
     def on_press(self, event):
         """
@@ -414,8 +415,9 @@ class Label_page(customtkinter.CTkFrame):
                                                      self.start_y, 
                                                      self.start_x, 
                                                      self.start_y, 
-                                                     outline="black", 
-                                                     tags="current_rect"+f"{self.count}")
+                                                     outline="red", 
+                                                     tags="current_rect"+f"{self.count}",
+                                                     width = 3)
         
     def on_drag(self, event):
         # ปรับปรุงขนาดของกล่องสี่เหลี่ยมขณะลาก
@@ -489,10 +491,6 @@ class Label_page(customtkinter.CTkFrame):
         self.select_tag_combo_box.set(value = "Select")
         self.select_tag_combo_box.pack(pady = 10)
 
-        # if os.path.exists(path = f"{self.combo_box.get()}/data.yaml"):
-        #     with open(f"{self.combo_box.get()}/data.yaml", "r") as file:
-        #         data = yaml.safe_load()
-        #     self.select_tag_combo_box.configure(values = data["names"])
 
         self.entry_widget_var = tkinter.StringVar()
         self.entry_widget = customtkinter.CTkEntry(master = self.top,
@@ -618,63 +616,47 @@ class Label_page(customtkinter.CTkFrame):
             self.top.destroy()
         
 
-            
-        
+    def show_old_label(self):
+        im_select_path = os.path.splitext(self.image_path_selected)[0]
+        if os.path.exists(path = im_select_path + ".txt"):
+            with open(file = im_select_path + ".txt", mode = "r") as read_file:
+                data = read_file.readlines()
+                info = []
+                for i in data:
+                    sub_info = [sub for sub in i.split(sep = " ")]
+                    print("sub_info =",sub_info)
+                    for j, k in enumerate(sub_info):
+                        if j == 0:
+                            sub_info[j] = int(k)
+                        else:
+                            sub_info[j] = float(k)
+                    # print(f"new sub info = {sub_info}")
+                    info.append(sub_info)
+                    sub_info = []
+
+                # print(f"info = {info}")
+
+                ## Draw box
+                for i in info:
+                    x_center, y_center, w, h = i[1:]
+                    x_start = (x_center - w/2) * self.resized_image_width
+                    y_start = (y_center - h/2) * self.resized_image_height
+                    x_end = (x_center + w/2) * self.resized_image_width
+                    y_end = (y_center + h/2) * self.resized_image_height
+                    self.image_zone.create_rectangle(x_start,
+                                                     y_start,
+                                                     x_end,
+                                                     y_end,
+                                                     width = 3,
+                                                     outline = "green")
 
 
 
+            # print("show old label")
+        else:
+            # print("No old label")
+            pass
 
-
-        # with open(file = path, mode = "r") as read_file:
-        #     data = yaml.safe_load(read_file)
-        #     data["names"] = [name]
-        #     with open(file = path, mode = "w") as write_file:
-        #         yaml.dump(data, write_file)
-        #         write_file.close()
-        #     read_file.close()
-
-
-        # if self.select_tag_combo_box.get() == "Select" and self.entry_widget_var.get() == "":
-        #     tkinter.messagebox.showerror(title = "Error",
-        #                                 message = "กรุณาเลือก/เพิ่ม Tag")
-        #     return
-        
-        # elif self.select_tag_combo_box.get() != "Select":
-        #     tag_name = self.select_tag_combo_box.get()
-        #     print(f"tag_name = {tag_name}")
-        #     if os.path.exists(f"{self.image_path_selected[:-4]}.txt"):
-        #         os.makedirs(f"{self.image_path_selected[:-4]}.txt")
-        #         # print(f"{self.image_path_selected[:-4]}.txt")
-        #     else:
-        #         print("ไม่มี")
-
-        #     self.top.destroy()
-
-        # else:
-        #     print(f"Entry = {self.entry_widget_var.get()}")
-
-        #     with open(f"{self.combo_box.get()}/data.yaml", "w+") as file:
-        #         data = yaml.safe_load(file)
-
-        #         for i in data.keys():
-        #             if i == "names":
-        #                 check = True
-        #                 break
-        #             else:
-        #                 check = False
-
-        #         if check:
-        #             data["names"].append(self.entry_widget_var.get())
-        #             data["nc"] += 1
-        #         else:
-        #             data["names"] = [self.entry_widget_var.get()]
-        #             data["nc"] = 1
-
-        #         yaml.safe_dump(data, file)
-                
-        #         file.close()
-
-        #     self.top.destroy()
         
 class Report_page(customtkinter.CTkFrame):
     def __init__(self, parent):
