@@ -652,9 +652,9 @@ class Label_page(customtkinter.CTkFrame):
 
 
 
-            # print("show old label")
+            print("show old label")
         else:
-            # print("No old label")
+            print("No old label")
             pass
 
         
