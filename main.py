@@ -178,6 +178,7 @@ class Label_page(customtkinter.CTkFrame):
         """
             Annotation Frame (พวก rectangular, go back) sub_frame_1
         """
+        self.rectangle_bool = False # เอาไว้เช็คค่าสถานะปุ่ม
         sub_frame_1 = customtkinter.CTkFrame(master = menu_side,
                                              fg_color = "#232F34")
         sub_frame_1.pack(side = "top",
@@ -190,24 +191,35 @@ class Label_page(customtkinter.CTkFrame):
                               padx = 10,
                               pady = 10,
                               fill = "x")
-        hand_button = customtkinter.CTkButton(master = annotation_frame,
+        self.hand_button = customtkinter.CTkButton(master = annotation_frame,
                                               fg_color = "white",
                                               bg_color = "transparent",
                                               image = customtkinter.CTkImage(Image.open(fp = "Icon_image/Hand.png"), 
                                                                              size = (30, 30)),
                                               text = "",
                                               width = 40,
-                                              height = 36)
-        hand_button.pack(side = "left", padx = 5)
-        retangular_button = customtkinter.CTkButton(master = annotation_frame,
+                                              height = 36,
+                                              command = lambda : self.hand_button_event())
+        self.hand_button.pack(side = "left", padx = 5)
+        self.rectangular_button = customtkinter.CTkButton(master = annotation_frame,
                                                     fg_color = "white",
                                                     bg_color = "transparent",
                                                     image = customtkinter.CTkImage(Image.open(fp = "Icon_image/rectangle_icon.png"),
                                                                                    size = (30, 30)),
                                                     text = "",
                                                     width =40,
-                                                    height = 36)
-        retangular_button.pack(side = "left", padx = 5)
+                                                    height = 36,
+                                                    command = lambda : self.rectangle_button_event())
+        self.rectangular_button.pack(side = "left", padx = 5)
+        # go_back_button = customtkinter.CTkButton(master = annotation_frame,
+        #                                          fg_color = "transparent",
+        #                                          bg_color = "transparent",
+        #                                          image = customtkinter.CTkImage(Image.open(fp = "Icon_image/go_back.png"),
+        #                                                                         size = (30, 30)), 
+        #                                          text = "",
+        #                                          width = 40,
+        #                                          height = 36)
+        # go_back_button.pack(side = "left", padx = 5)
         go_back_button = customtkinter.CTkButton(master = annotation_frame,
                                                  fg_color = "transparent",
                                                  bg_color = "transparent",
@@ -215,16 +227,8 @@ class Label_page(customtkinter.CTkFrame):
                                                                                 size = (30, 30)), 
                                                  text = "",
                                                  width = 40,
-                                                 height = 36)
-        go_back_button.pack(side = "left", padx = 5)
-        go_back_button = customtkinter.CTkButton(master = annotation_frame,
-                                                 fg_color = "transparent",
-                                                 bg_color = "transparent",
-                                                 image = customtkinter.CTkImage(Image.open(fp = "Icon_image/go_forward.png"),
-                                                                                size = (30, 30)), 
-                                                 text = "",
-                                                 width = 40,
-                                                 height = 36)
+                                                 height = 36,
+                                                 command = lambda : self.redo_event())
         go_back_button.pack(side = "left", padx = 5)
 
 
@@ -303,7 +307,7 @@ class Label_page(customtkinter.CTkFrame):
         # ตัวแปรสำหรับการลากเลือก
         self.rect = None
         self.img_tk = None
-
+        
         
         """
             zone image
@@ -321,6 +325,22 @@ class Label_page(customtkinter.CTkFrame):
         self.image_zone.bind("<B1-Motion>", func = self.on_drag)
         self.image_zone.bind("<ButtonRelease-1>", func = self.on_release)
 
+    def redo_event(self):
+        test = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
+                                    message = "คุณต้องการที่จะ label รูปภาพนี้ใหม่ใช่หรือไม่?")
+        print("test =", test)
+
+    def hand_button_event(self):
+        """ฟังก์ชันเช็ค ว่าเลือกเครื่องมือถูกไหม"""
+        self.rectangle_bool = False
+        self.hand_button.configure(fg_color = "#65B741")
+        self.rectangular_button.configure(fg_color = "white")
+        
+    def rectangle_button_event(self):
+        """ฟังก์ชันเช็ค ว่าเลือกเครื่องมือถูกไหม"""
+        self.rectangle_bool = True
+        self.hand_button.configure(fg_color = "white")
+        self.rectangular_button.configure(fg_color = "#65B741")
 
     def update_classtree(self):
         """ฟังก์ชันดึงข้อมูลจาก file data.yaml"""
@@ -406,33 +426,42 @@ class Label_page(customtkinter.CTkFrame):
         """
         ฟังก์ชันการลากแล้วกำหนดขอบเขตการ Label
         """
-        # เก็บตำแหน่งเริ่มต้นของการลากเลือก
-        self.start_x = self.image_zone.canvasx(event.x)
-        self.start_y = self.image_zone.canvasy(event.y)
-        
-        # สร้างกล่องสี่เหลี่ยมเริ่มต้น
-        self.rect = self.image_zone.create_rectangle(self.start_x, 
-                                                     self.start_y, 
-                                                     self.start_x, 
-                                                     self.start_y, 
-                                                     outline="red", 
-                                                     tags="current_rect"+f"{self.count}",
-                                                     width = 3)
-        
+        if self.rectangle_bool == True:
+            # เก็บตำแหน่งเริ่มต้นของการลากเลือก
+            self.start_x = self.image_zone.canvasx(event.x)
+            self.start_y = self.image_zone.canvasy(event.y)
+            
+            # สร้างกล่องสี่เหลี่ยมเริ่มต้น
+            self.rect = self.image_zone.create_rectangle(self.start_x, 
+                                                        self.start_y, 
+                                                        self.start_x, 
+                                                        self.start_y, 
+                                                        outline="red", 
+                                                        tags="current_rect"+f"{self.count}",
+                                                        width = 3)
+        else:
+            print("เลือกเครื่องมือก่อน")
+
     def on_drag(self, event):
-        # ปรับปรุงขนาดของกล่องสี่เหลี่ยมขณะลาก
-        cur_x = self.image_zone.canvasx(event.x)
-        cur_y = self.image_zone.canvasy(event.y)
-        self.image_zone.coords("current_rect"+f"{self.count}", self.start_x, self.start_y, cur_x, cur_y)
+        if self.rectangle_bool == True:
+            # ปรับปรุงขนาดของกล่องสี่เหลี่ยมขณะลาก
+            cur_x = self.image_zone.canvasx(event.x)
+            cur_y = self.image_zone.canvasy(event.y)
+            self.image_zone.coords("current_rect"+f"{self.count}", self.start_x, self.start_y, cur_x, cur_y)
+        else:
+            pass
     
     def on_release(self, event):
-        # เก็บข้อมูล bounding box เมื่อปล่อยเมาส์
-        end_x = self.image_zone.canvasx(event.x)
-        end_y = self.image_zone.canvasy(event.y)
-        bbox = (min(self.start_x, end_x), min(self.start_y, end_y), max(self.start_x, end_x), max(self.start_y, end_y))
-        self.bbox_data.append(bbox)
-        self.count += 1
-        self.box_info()
+        if self.rectangle_bool == True:
+            # เก็บข้อมูล bounding box เมื่อปล่อยเมาส์
+            end_x = self.image_zone.canvasx(event.x)
+            end_y = self.image_zone.canvasy(event.y)
+            bbox = (min(self.start_x, end_x), min(self.start_y, end_y), max(self.start_x, end_x), max(self.start_y, end_y))
+            self.bbox_data.append(bbox)
+            self.count += 1
+            self.box_info()
+        else:
+            pass
 
     def box_info(self):
         """
@@ -467,6 +496,7 @@ class Label_page(customtkinter.CTkFrame):
         # setup
         
         self.top = customtkinter.CTkToplevel()
+        self.top.after(250, lambda : self.top.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
         top_width = 300
         top_height = 200
         screen_width = self.winfo_screenwidth()
@@ -474,7 +504,6 @@ class Label_page(customtkinter.CTkFrame):
         x = (screen_width/2) - (top_width/2)
         y = (screen_height/2) - (top_height/2)
         self.top.title(string = "Tag Select")
-        self.top.after(250, lambda : self.top.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
         self.top.geometry(geometry_string = f"{top_width}x{top_height}+{int(x)}+{int(y)}")
         self.top.config(bg = "white")
         self.top.resizable(False, False)
@@ -482,7 +511,8 @@ class Label_page(customtkinter.CTkFrame):
         
         # Widget
         label = customtkinter.CTkLabel(master = self.top,
-                                       font = ("Calibri Bold", 18))
+                                       font = ("Calibri Bold", 18),
+                                       text = "Select/Create Tags")
         label.pack(fill = "x")
         
         self.select_tag_combo_box = ttk.Combobox(master = self.top,
@@ -538,7 +568,7 @@ class Label_page(customtkinter.CTkFrame):
             data = yaml.safe_load(read_file)
         print("data =", data)
 
-        if self.select_tag_combo_box.get() == "Select" and self.entry_widget_var.get() == "":
+        if self.select_tag_combo_box.get() == "Select" and self.entry_widget_var.get().strip().lower() == "":
             tkinter.messagebox.showerror(title = "Error",
                                          message = "กรุณาเลือก/เพิ่ม Tag")
             return
@@ -557,7 +587,7 @@ class Label_page(customtkinter.CTkFrame):
                                 index = i
                                 break
 
-                    line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                    line = f"\n{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
                     read_file.write(line)
                 self.update_classtree()
                 self.top.destroy()
@@ -574,14 +604,58 @@ class Label_page(customtkinter.CTkFrame):
                                 index = i
                                 break
 
-                    line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                    line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}".strip()
                     write_file.write(line)
                 self.update_classtree()
                 self.top.destroy()
 
 
-        elif self.entry_widget_var.get() != "":
-            data["names"].append(self.entry_widget_var.get())
+        elif self.entry_widget_var.get().strip().lower() != "":
+            
+            # if os.path.exists(path = f"{im_select_path}.txt"):
+            #     print("มีไฟล์ txt อยู่แล้ว")
+            #     with open(file = f"{im_select_path}.txt", mode = "a") as read_file:
+
+            #         with open(file = path, mode = "r") as yaml_read_file:
+            #             data_read = yaml.safe_load(yaml_read_file)
+                        
+            #             for i,j in enumerate(data_read["names"]):
+            #                 if j == self.select_tag_combo_box.get():
+            #                     index = i
+            #                     break
+
+            #         line = f"\n{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
+            #         read_file.write(line)
+            #     self.update_classtree()
+            #     self.top.destroy()
+
+            for i in data["names"]:
+                if i == self.entry_widget_var.get().strip().lower():
+                    print("มีชื่อ class นี้อยู่แล้วเดิมอยู่แล้ว")
+                    
+                    with open(file = f"{im_select_path}.txt", mode = "a") as read_file:
+                        with open(file = path, mode = "r") as yaml_read_file:
+                            data_read = yaml.safe_load(yaml_read_file)
+                            
+                            for j,k in enumerate(data_read["names"]):
+                                if k == self.entry_widget_var.get().strip().lower():
+                                    index = j
+                                    break
+                        
+
+                        if os.stat(f"{im_select_path}.txt").st_size == 0:
+                            line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
+                        else:
+                            line = f"\n{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
+
+                        read_file.write(line)
+                    self.top.destroy()
+                    return
+                else:
+                    pass
+
+
+            data["names"].append(self.entry_widget_var.get().strip().lower())
             data["nc"] += 1
 
             if os.path.exists(path = f"{im_select_path}.txt"):
@@ -590,12 +664,12 @@ class Label_page(customtkinter.CTkFrame):
                 with open(file = path, mode = "r") as read_file:
                     data_read = yaml.safe_load(read_file)
                     for i,j in enumerate(data_read["names"]):
-                        if j == self.entry_widget_var.get():
+                        if j == self.entry_widget_var.get().strip().lower():
                             index = i
                             break
 
                 with open(file = f"{im_select_path}.txt", mode = "a") as write_file:
-                    line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                    line = f"\n{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
                     write_file.write(line)
                     
             else:
@@ -604,13 +678,13 @@ class Label_page(customtkinter.CTkFrame):
                 with open(file = path, mode = "r") as read_file:
                     data_read = yaml.safe_load(read_file)
                     for i,j in enumerate(data_read["names"]):
-                        if j == self.entry_widget_var.get():
+                        if j == self.entry_widget_var.get().strip().lower():
                             index = i
                             break
 
 
                     with open(f"{im_select_path}.txt", mode = "w") as txt_file:
-                        line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}\n"
+                        line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
                         txt_file.write(line)
             self.update_classtree()
             self.top.destroy()
@@ -669,6 +743,8 @@ class Report_page(customtkinter.CTkFrame):
                                        text = "Report Page",
                                        font = ("Calibri Bold", 30))
         label.pack()
+
+
 
 
 ### -> Root App
