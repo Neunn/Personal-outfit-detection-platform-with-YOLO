@@ -76,10 +76,91 @@ class Train_page(customtkinter.CTkFrame):
         """
         Content Inside
         """
-        label = customtkinter.CTkLabel(master = self,
-                                       text = "Training Page",
-                                       font = ("Calibri Bold", 30))
-        label.pack(side = "top")
+
+        inside_frame = customtkinter.CTkFrame(master = self,
+                                               corner_radius = 20,
+                                               fg_color = "#D2DBE0")
+        inside_frame.pack(side = "top",
+                          padx = 20,
+                          pady = 10,
+                          expand = True,
+                          fill = "both")
+        
+        ### setup column weight
+        inside_frame.columnconfigure(index = 0, weight = 2)
+        inside_frame.columnconfigure(index = 1, weight = 2)
+        inside_frame.columnconfigure(index = 3, weight = 16)
+
+
+        ### All element
+        choose_model_label = customtkinter.CTkLabel(master = inside_frame, 
+                                                    text = "Choose pretrained model",
+                                                    font = ("Calibri Bold", 20))
+        choose_model_label.grid(row = 0, 
+                                column = 0,
+                                sticky = "N",
+                                padx = 5,
+                                pady = 10)
+
+        model_combo_box = customtkinter.CTkComboBox(master = inside_frame,
+                                                    state = "readonly",
+                                                    values = ["yolov8n.pt", 
+                                                              "yolov8s.pt",
+                                                              "yolov8m.pt",
+                                                              "yolov8l.pt",
+                                                              "yolov8x.pt"],
+                                                    hover = True)
+        model_combo_box.set("Select")
+        model_combo_box.grid(row = 1, 
+                             column = 0,
+                             sticky = "WE",
+                             padx = 5,
+                             pady = 10)
+        
+        train_test_label = customtkinter.CTkLabel(master = inside_frame, 
+                                                    text = "Train / Test %")
+        train_test_label.grid(row = 2, column = 0)
+
+        self.slider_train_test_variable = tkinter.IntVar()
+        self.slider_train_test = customtkinter.CTkSlider(master = inside_frame,
+                                                from_ = 0,
+                                                to = 100,
+                                                number_of_steps = 100,
+                                                hover = True,
+                                                variable = self.slider_train_test_variable)
+        
+        self.slider_train_test.grid(row = 3, column = 0)
+
+
+        show_percent_train_test = customtkinter.CTkLabel(master = inside_frame,
+                                              textvariable = self.slider_train_test_variable)
+        show_percent_train_test.grid(row = 4, column = 0)
+
+
+        valid_test_label = customtkinter.CTkLabel(master = inside_frame,
+                                                  text = "Test / Validation")
+        valid_test_label.grid(row = 5, column = 0)
+
+        self.slider_valid_test_var = tkinter.IntVar()
+        self.valid_test_slider = customtkinter.CTkSlider(master = inside_frame,
+                                                         command = lambda event : print(event))
+        self.valid_test_slider.grid(row = 6, column = 0)
+        self.show_percent_valid_test = customtkinter.CTkLabel(master = inside_frame, 
+                                                              textvariable = self.slider_valid_test_var)
+        self.show_percent_valid_test.grid(row = 7, column = 0)
+
+        epoch_label = customtkinter.CTkLabel(master = inside_frame,
+                                             text = "Epoch")
+        epoch_label.grid(row = 8, column = 0)
+
+        entry_epoch = customtkinter.CTkEntry(master = inside_frame)
+        entry_epoch.grid(row = 9, column = 0)
+
+        batch_size_label = customtkinter.CTkLabel(master = inside_frame,
+                                                  text = "Batch Size")
+        batch_size_label.grid(row = 10, column = 0)
+        self.batch_size_entry = customtkinter.CTkEntry(master=inside_frame)
+        self.batch_size_entry.grid(row = 11, column = 0)
 
 ### -> Upload Page Class
 class Upload_page(customtkinter.CTkFrame):
@@ -155,7 +236,6 @@ class Label_page(customtkinter.CTkFrame):
         # setup
         super().__init__(master = parent, 
                          fg_color = "white")
-
         """
         Zone สำหรับ menu จะเป็น Frame ใหญ่ประกอบด้วย
         1. Label Tools
@@ -211,15 +291,7 @@ class Label_page(customtkinter.CTkFrame):
                                                     height = 36,
                                                     command = lambda : self.rectangle_button_event())
         self.rectangular_button.pack(side = "left", padx = 5)
-        # go_back_button = customtkinter.CTkButton(master = annotation_frame,
-        #                                          fg_color = "transparent",
-        #                                          bg_color = "transparent",
-        #                                          image = customtkinter.CTkImage(Image.open(fp = "Icon_image/go_back.png"),
-        #                                                                         size = (30, 30)), 
-        #                                          text = "",
-        #                                          width = 40,
-        #                                          height = 36)
-        # go_back_button.pack(side = "left", padx = 5)
+
         go_back_button = customtkinter.CTkButton(master = annotation_frame,
                                                  fg_color = "transparent",
                                                  bg_color = "transparent",
@@ -300,6 +372,10 @@ class Label_page(customtkinter.CTkFrame):
                                 text = "No.")
         self.tree_image_list.heading(column = "Check",
                                 text = "Check")
+        self.scrollbar = ttk.Scrollbar(master = border_frame,
+                                       orient = "vertical",
+                                       command = self.tree_image_list.yview)
+        self.tree_image_list["yscrollcommand"] = self.scrollbar.set
         self.tree_image_list.bind("<<TreeviewSelect>>",
                                   func = lambda event : self.select_image())
 
@@ -325,10 +401,28 @@ class Label_page(customtkinter.CTkFrame):
         self.image_zone.bind("<B1-Motion>", func = self.on_drag)
         self.image_zone.bind("<ButtonRelease-1>", func = self.on_release)
 
-    def redo_event(self):
-        test = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
+    def redo_event(self):    
+        message_bool = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
                                     message = "คุณต้องการที่จะ label รูปภาพนี้ใหม่ใช่หรือไม่?")
-        print("test =", test)
+        if message_bool == True:
+            if os.path.exists(path = os.path.splitext(self.image_path_selected)[0] + ".txt"):
+                os.remove(path = os.path.splitext(self.image_path_selected)[0] + ".txt")
+                tkinter.messagebox.showinfo(title = "Infomation",
+                                            message = "ย้อนกลับใหม่เรียบร้อยแล้ว")
+                self.image_zone.delete("all")
+
+                ## update ค่า True เป็น "" หลังจากลบ
+                focused = self.tree_image_list.focus()
+                self.tree_image_list.item(focused, 
+                                          text = "", 
+                                          values = (self.tree_image_list.item(focused)["values"][0], ""))
+
+                
+            else:
+                tkinter.messagebox.showerror(title = "Error",
+                                             message = "ยังไม่มีการสร้างไฟล์ label")
+        else:
+            pass
 
     def hand_button_event(self):
         """ฟังก์ชันเช็ค ว่าเลือกเครื่องมือถูกไหม"""
@@ -385,42 +479,55 @@ class Label_page(customtkinter.CTkFrame):
         for root, dirs, files in os.walk(self.combo_box.get()):
             for file in files:
                 if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                    self.tree_image_list.insert('', 'end', value = (file,))
+                    if os.path.exists(path = f"{self.combo_box.get()}/{os.path.splitext(file)[0]}.txt"):
+                        self.tree_image_list.insert('', 'end', value = (file,"True"))
+                    else:
+                        self.tree_image_list.insert("", "end", values = (file, ""))
+        
 
 
     def select_image(self):
         """
         ฟังก์ชันการเปลี่ยนรูปภาพตามรูปที่เราเลือก 
         """
-        self.count = 0
-        selected_image = self.tree_image_list.selection()[0]
-        print(selected_image)
-        print("")
-        self.image_path_selected = self.combo_box.get() + "/" + self.tree_image_list.item(item = selected_image)["values"][0]
-        print(f"path = {self.image_path_selected}")
-        print("")
+        try:
+            self.count = 0
+            self.tree_image_list.focus_set()
+            selected_image = self.tree_image_list.focus()
+            
+            print("")
+            print(f"selected_image = {selected_image}")
+            print("")
+            # print(f"self.tree_image_list.item(item = selected_image)['values'][0] = {self.tree_image_list.item(item = selected_image)['values'].values()}")
+            print("")
+            self.image_path_selected = self.combo_box.get() + "/" + self.tree_image_list.item(item = selected_image)["values"][0]
+            print(f"path = {self.image_path_selected}")
+            print("")
 
-        self.image_zone.delete("all")
-        image = Image.open(self.image_path_selected)
-        canvas_width = self.image_zone.winfo_width()
-        canvas_height = self.image_zone.winfo_height()
-        ratio = min(canvas_width / image.width, canvas_height / image.height)
-        new_width = int(image.width * ratio)
-        new_height = int(image.height * ratio)
+            self.image_zone.delete("all")
+            image = Image.open(self.image_path_selected)
+            canvas_width = self.image_zone.winfo_width()
+            canvas_height = self.image_zone.winfo_height()
+            ratio = min(canvas_width / image.width, canvas_height / image.height)
+            new_width = int(image.width * ratio)
+            new_height = int(image.height * ratio)
 
-        # ปรับขนาดของภาพ
-        resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
-        self.image = ImageTk.PhotoImage(resized_image)
-        print(f"width = {resized_image.width}, height = {resized_image.height}")
-        self.resized_image_width = resized_image.width
-        self.resized_image_height = resized_image.height
+            # ปรับขนาดของภาพ
+            resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
+            self.image = ImageTk.PhotoImage(resized_image)
+            print(f"width = {resized_image.width}, height = {resized_image.height}")
+            self.resized_image_width = resized_image.width
+            self.resized_image_height = resized_image.height
 
-        # ลบภาพเก่า (ถ้ามี)
-        self.image_zone.delete("all")
+            # ลบภาพเก่า (ถ้ามี)
+            self.image_zone.delete("all")
 
-        self.image_zone.create_image(0, 0, anchor=tkinter.NW, image=self.image)
-        self.image_zone.image = self.image
-        self.show_old_label()
+            self.image_zone.create_image(0, 0, anchor=tkinter.NW, image=self.image)
+            self.image_zone.image = self.image
+            self.show_old_label()
+        except:
+            pass
+
 
     def on_press(self, event):
         """
@@ -437,7 +544,7 @@ class Label_page(customtkinter.CTkFrame):
                                                         self.start_x, 
                                                         self.start_y, 
                                                         outline="red", 
-                                                        tags="current_rect"+f"{self.count}",
+                                                        tags= "current_rect"+f"{self.count}",
                                                         width = 3)
         else:
             print("เลือกเครื่องมือก่อน")
@@ -494,7 +601,6 @@ class Label_page(customtkinter.CTkFrame):
         """หน้าต่าง top level เวลาลาก box เสร็จ"""
 
         # setup
-        
         self.top = customtkinter.CTkToplevel()
         self.top.after(250, lambda : self.top.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
         top_width = 300
@@ -590,6 +696,7 @@ class Label_page(customtkinter.CTkFrame):
                     line = f"\n{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
                     read_file.write(line)
                 self.update_classtree()
+                self.tree_image_list.set(self.tree_image_list.focus(), "#2", "True")
                 self.top.destroy()
 
             else:
@@ -607,27 +714,11 @@ class Label_page(customtkinter.CTkFrame):
                     line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}".strip()
                     write_file.write(line)
                 self.update_classtree()
+                self.tree_image_list.set(self.tree_image_list.focus(), "#2", "True")
                 self.top.destroy()
 
 
         elif self.entry_widget_var.get().strip().lower() != "":
-            
-            # if os.path.exists(path = f"{im_select_path}.txt"):
-            #     print("มีไฟล์ txt อยู่แล้ว")
-            #     with open(file = f"{im_select_path}.txt", mode = "a") as read_file:
-
-            #         with open(file = path, mode = "r") as yaml_read_file:
-            #             data_read = yaml.safe_load(yaml_read_file)
-                        
-            #             for i,j in enumerate(data_read["names"]):
-            #                 if j == self.select_tag_combo_box.get():
-            #                     index = i
-            #                     break
-
-            #         line = f"\n{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
-            #         read_file.write(line)
-            #     self.update_classtree()
-            #     self.top.destroy()
 
             for i in data["names"]:
                 if i == self.entry_widget_var.get().strip().lower():
@@ -649,6 +740,7 @@ class Label_page(customtkinter.CTkFrame):
                             line = f"\n{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
 
                         read_file.write(line)
+                    self.tree_image_list.set(self.tree_image_list.focus(), "#2", "True")
                     self.top.destroy()
                     return
                 else:
@@ -687,6 +779,7 @@ class Label_page(customtkinter.CTkFrame):
                         line = f"{index} {self.x_center} {self.y_center} {self.w} {self.h}".rstrip()
                         txt_file.write(line)
             self.update_classtree()
+            self.tree_image_list.set(self.tree_image_list.focus(), "#2", "True")
             self.top.destroy()
         
 
@@ -731,7 +824,6 @@ class Label_page(customtkinter.CTkFrame):
             print("No old label")
             pass
 
-        
 class Report_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color = "white")
