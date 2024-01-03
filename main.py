@@ -93,14 +93,22 @@ class Train_page(customtkinter.CTkFrame):
 
 
         ### All element
+        title_label = customtkinter.CTkLabel(master = inside_frame,
+                                             text = "Configuration",
+                                             font = ("Calibri Bold", 25))
+        title_label.grid(row = 0, 
+                         column = 0,
+                         sticky = "N",
+                         pady = 10)
+
         choose_model_label = customtkinter.CTkLabel(master = inside_frame, 
                                                     text = "Choose pretrained model",
-                                                    font = ("Calibri Bold", 20))
-        choose_model_label.grid(row = 0, 
+                                                    font = ("Calibri Light", 16))
+        choose_model_label.grid(row = 1, 
                                 column = 0,
-                                sticky = "N",
-                                padx = 5,
-                                pady = 10)
+                                sticky = "W",
+                                padx = 10,
+                                pady = 0)
 
         model_combo_box = customtkinter.CTkComboBox(master = inside_frame,
                                                     state = "readonly",
@@ -111,15 +119,20 @@ class Train_page(customtkinter.CTkFrame):
                                                               "yolov8x.pt"],
                                                     hover = True)
         model_combo_box.set("Select")
-        model_combo_box.grid(row = 1, 
+        model_combo_box.grid(row = 2, 
                              column = 0,
                              sticky = "WE",
-                             padx = 5,
+                             padx = 10,
                              pady = 10)
         
         train_test_label = customtkinter.CTkLabel(master = inside_frame, 
-                                                    text = "Train / Test %")
-        train_test_label.grid(row = 2, column = 0)
+                                                    text = "Train / Test %",
+                                                    font = ("Calibri Light", 16))
+        train_test_label.grid(row = 3, 
+                              column = 0, 
+                              sticky = "W",
+                              padx = 10,
+                              pady = 5)
 
         self.slider_train_test_variable = tkinter.IntVar()
         self.slider_train_test = customtkinter.CTkSlider(master = inside_frame,
@@ -127,40 +140,80 @@ class Train_page(customtkinter.CTkFrame):
                                                 to = 100,
                                                 number_of_steps = 100,
                                                 hover = True,
-                                                variable = self.slider_train_test_variable)
+                                                variable = self.slider_train_test_variable,
+                                                height = 20,
+                                                button_hover_color = "green",
+                                                progress_color = "#4F6F52")
         
-        self.slider_train_test.grid(row = 3, column = 0)
+        self.slider_train_test.grid(row = 4, 
+                                    column = 0,
+                                    padx = 10,
+                                    sticky = "WE",
+                                    columnspan = 2)
 
 
         show_percent_train_test = customtkinter.CTkLabel(master = inside_frame,
-                                              textvariable = self.slider_train_test_variable)
-        show_percent_train_test.grid(row = 4, column = 0)
+                                                         textvariable = self.slider_train_test_variable)
+        show_percent_train_test.grid(row = 5, 
+                                     column = 0,
+                                     columnspan = 2)
 
 
         valid_test_label = customtkinter.CTkLabel(master = inside_frame,
-                                                  text = "Test / Validation")
-        valid_test_label.grid(row = 5, column = 0)
+                                                  text = "Test / Validation",
+                                                  font = ("Calibri light", 16))
+        valid_test_label.grid(row = 6, 
+                              column = 0,
+                              padx = 10,
+                              pady = 10,
+                              sticky = "W",
+                              columnspan = 2)
 
         self.slider_valid_test_var = tkinter.IntVar()
         self.valid_test_slider = customtkinter.CTkSlider(master = inside_frame,
-                                                         command = lambda event : print(event))
-        self.valid_test_slider.grid(row = 6, column = 0)
+                                                         command = lambda event : print(event),
+                                                         height = 20,
+                                                         button_hover_color = "green",
+                                                         progress_color = "#4F6F52")
+        self.valid_test_slider.grid(row = 7, 
+                                    column = 0,
+                                    sticky = "WE",
+                                    columnspan = 2,
+                                    padx = 10)
+        
         self.show_percent_valid_test = customtkinter.CTkLabel(master = inside_frame, 
                                                               textvariable = self.slider_valid_test_var)
-        self.show_percent_valid_test.grid(row = 7, column = 0)
+        self.show_percent_valid_test.grid(row = 8, 
+                                          column = 0,
+                                          columnspan = 2)
 
         epoch_label = customtkinter.CTkLabel(master = inside_frame,
-                                             text = "Epoch")
-        epoch_label.grid(row = 8, column = 0)
+                                             text = "Epoch",
+                                             font = ("Calibri Light", 16))
+        epoch_label.grid(row = 9, 
+                         column = 0,
+                         sticky = "W",
+                         padx = 10)
 
         entry_epoch = customtkinter.CTkEntry(master = inside_frame)
-        entry_epoch.grid(row = 9, column = 0)
+        entry_epoch.grid(row = 10, 
+                         column = 0,
+                         sticky = "W",
+                         padx = 10)
 
         batch_size_label = customtkinter.CTkLabel(master = inside_frame,
-                                                  text = "Batch Size")
-        batch_size_label.grid(row = 10, column = 0)
+                                                  text = "Batch Size",
+                                                  font = ("Calibri Light", 16))
+        batch_size_label.grid(row = 11, 
+                              column = 0,
+                              stick = "W",
+                              padx = 10)
+
         self.batch_size_entry = customtkinter.CTkEntry(master=inside_frame)
-        self.batch_size_entry.grid(row = 11, column = 0)
+        self.batch_size_entry.grid(row = 12, 
+                                   column = 0,
+                                   stick = "W",
+                                   padx = 10)
 
 ### -> Upload Page Class
 class Upload_page(customtkinter.CTkFrame):
