@@ -68,7 +68,7 @@ class Home_page(customtkinter.CTkFrame):
                        text = how_to)
         textbox.configure(state = "disabled")
 
-### -> Train Page Class
+### -> Train Page Class (กำลังทำ)
 class Train_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color= "white")
@@ -282,7 +282,7 @@ class Upload_page(customtkinter.CTkFrame):
         tkinter.messagebox.showinfo(title = "Succesful", 
                                     message = "Upload Successfully")
 
-### -> Train Page Class (กำลังทำ)
+### -> Label Page Class 
 class Label_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         
@@ -566,7 +566,7 @@ class Label_page(customtkinter.CTkFrame):
             new_height = int(image.height * ratio)
 
             # ปรับขนาดของภาพ
-            resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
+            resized_image = image.resize((new_width, new_height), Image.LANCZOS)
             self.image = ImageTk.PhotoImage(resized_image)
             print(f"width = {resized_image.width}, height = {resized_image.height}")
             self.resized_image_width = resized_image.width
