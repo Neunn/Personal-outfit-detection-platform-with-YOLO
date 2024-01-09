@@ -72,6 +72,8 @@ class Home_page(customtkinter.CTkFrame):
 class Train_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color= "white")
+
+
         
         """
         Content Inside
@@ -110,7 +112,7 @@ class Train_page(customtkinter.CTkFrame):
                                 padx = 10,
                                 pady = 0)
 
-        model_combo_box = customtkinter.CTkComboBox(master = inside_frame,
+        self.model_combo_box = customtkinter.CTkComboBox(master = inside_frame,
                                                     state = "readonly",
                                                     values = ["yolov8n.pt", 
                                                               "yolov8s.pt",
@@ -118,8 +120,8 @@ class Train_page(customtkinter.CTkFrame):
                                                               "yolov8l.pt",
                                                               "yolov8x.pt"],
                                                     hover = True)
-        model_combo_box.set("Select")
-        model_combo_box.grid(row = 2, 
+        self.model_combo_box.set("Select")
+        self.model_combo_box.grid(row = 2, 
                              column = 0,
                              sticky = "WE",
                              padx = 10,
@@ -141,7 +143,8 @@ class Train_page(customtkinter.CTkFrame):
                                                 number_of_steps = 100,
                                                 hover = True,
                                                 variable = self.slider_train_test_variable,
-                                                height = 20,
+                                                command = lambda event : self.slider_proportion(),
+                                                height = 25,
                                                 button_hover_color = "green",
                                                 progress_color = "#4F6F52")
         
@@ -169,10 +172,13 @@ class Train_page(customtkinter.CTkFrame):
                               sticky = "W",
                               columnspan = 2)
 
-        self.slider_valid_test_var = tkinter.IntVar()
+        self.slider_valid_test_variable = tkinter.IntVar()
         self.valid_test_slider = customtkinter.CTkSlider(master = inside_frame,
                                                          command = lambda event : print(event),
-                                                         height = 20,
+                                                         height = 25,
+                                                         from_=0,
+                                                         to = 100 - self.slider_train_test_variable.get(),
+                                                         variable = self.slider_valid_test_variable,
                                                          button_hover_color = "green",
                                                          progress_color = "#4F6F52")
         self.valid_test_slider.grid(row = 7, 
@@ -182,7 +188,7 @@ class Train_page(customtkinter.CTkFrame):
                                     padx = 10)
         
         self.show_percent_valid_test = customtkinter.CTkLabel(master = inside_frame, 
-                                                              textvariable = self.slider_valid_test_var)
+                                                              textvariable = self.slider_valid_test_variable)
         self.show_percent_valid_test.grid(row = 8, 
                                           column = 0,
                                           columnspan = 2)
@@ -214,6 +220,13 @@ class Train_page(customtkinter.CTkFrame):
                                    column = 0,
                                    stick = "W",
                                    padx = 10)
+        
+        
+
+    def slider_proportion(self):
+        self.valid_test_slider.configure(from_ = 0,
+                                         to = 100 - self.slider_train_test_variable.get())
+
 
 ### -> Upload Page Class
 class Upload_page(customtkinter.CTkFrame):
