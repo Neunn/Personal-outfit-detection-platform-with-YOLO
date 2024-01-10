@@ -200,11 +200,29 @@ class Train_page(customtkinter.CTkFrame):
                          column = 0,
                          sticky = "W",
                          padx = 10)
+        
+        folder_select_label = customtkinter.CTkLabel(master = inside_frame,
+                                                     text = "Folder Select",
+                                                     font = ("Calibri Light", 16))
+        folder_select_label.grid(row = 9,
+                                 column = 1,
+                                 sticky = "W",
+                                 padx = 10)
+        folder_combo_box = customtkinter.CTkComboBox(master = inside_frame,
+                                                     state = "readonly")
+        folder_combo_box.set("Select")
+        folder_combo_box.grid(row = 10,
+                              column = 1,
+                              columnspan = 2, 
+                              padx = 5,
+                              sticky = "WE")
+        folder_list = self.get_folder()
+        folder_combo_box.configure(values = folder_list)
 
-        entry_epoch = customtkinter.CTkEntry(master = inside_frame)
-        entry_epoch.grid(row = 10, 
+        self.entry_epoch = customtkinter.CTkEntry(master = inside_frame)
+        self.entry_epoch.grid(row = 10, 
                          column = 0,
-                         sticky = "W",
+                         sticky = "WE",
                          padx = 10)
 
         batch_size_label = customtkinter.CTkLabel(master = inside_frame,
@@ -218,11 +236,30 @@ class Train_page(customtkinter.CTkFrame):
         self.batch_size_entry = customtkinter.CTkEntry(master=inside_frame)
         self.batch_size_entry.grid(row = 12, 
                                    column = 0,
-                                   stick = "W",
+                                   stick = "WE",
                                    padx = 10)
         
+        train_button = customtkinter.CTkButton(master = inside_frame,
+                                               text = "Train model")
+        train_button.grid(row = 13,
+                          column = 0,
+                          columnspan = 2,
+                          sticky = "W",
+                          padx = 10,
+                          pady = 20)
         
-
+                                            
+    def get_folder(self):
+        workspace_path = os.listdir()
+        folder_list = []
+        for i in workspace_path:
+            if i[:6] == "Image_":
+                folder_list.append(i)
+            else:
+                pass
+        return folder_list
+        
+        
     def slider_proportion(self):
         self.valid_test_slider.configure(from_ = 0,
                                          to = 100 - self.slider_train_test_variable.get())
@@ -519,6 +556,7 @@ class Label_page(customtkinter.CTkFrame):
             for item in self.class_table.get_children():
                 self.class_table.delete(item)
 
+    
     def get_folder(self):
         """ฟังก์ชันดึงชื่อของ Folder ไปใส่ใน Combobox"""
         test = os.listdir()
