@@ -3,7 +3,7 @@ import tkinter
 from tkinter import ttk
 from PIL import Image, ImageTk
 from tkinter import filedialog as fd
-import os 
+import os, shutil
 import patoolib
 import yaml
 
@@ -208,16 +208,18 @@ class Train_page(customtkinter.CTkFrame):
                                  column = 1,
                                  sticky = "W",
                                  padx = 10)
-        folder_combo_box = customtkinter.CTkComboBox(master = inside_frame,
+        
+        self.folder_combo_box = customtkinter.CTkComboBox(master = inside_frame,
                                                      state = "readonly")
-        folder_combo_box.set("Select")
-        folder_combo_box.grid(row = 10,
+        self.folder_combo_box.set("Select")
+        self.folder_combo_box.grid(row = 10,
                               column = 1,
                               columnspan = 2, 
                               padx = 5,
                               sticky = "WE")
+        
         folder_list = self.get_folder()
-        folder_combo_box.configure(values = folder_list)
+        self.folder_combo_box.configure(values = folder_list)
 
         self.entry_epoch = customtkinter.CTkEntry(master = inside_frame)
         self.entry_epoch.grid(row = 10, 
@@ -234,13 +236,14 @@ class Train_page(customtkinter.CTkFrame):
                               padx = 10)
 
         self.batch_size_entry = customtkinter.CTkEntry(master=inside_frame)
-        self.batch_size_entry.grid(row = 12, 
+        self.batch_size_entry.grid(row = 12,
                                    column = 0,
                                    stick = "WE",
                                    padx = 10)
         
         train_button = customtkinter.CTkButton(master = inside_frame,
-                                               text = "Train model")
+                                               text = "Train model",
+                                               command = lambda : self.train_button_func())
         train_button.grid(row = 13,
                           column = 0,
                           columnspan = 2,
@@ -248,6 +251,38 @@ class Train_page(customtkinter.CTkFrame):
                           padx = 10,
                           pady = 20)
         
+        revert_button = customtkinter.CTkButton(master = inside_frame,
+                                                text = "Revert",
+                                                command = lambda : self.revert_button_func(),
+                                                fg_color = "red",
+                                                text_color = "white")
+        revert_button.grid(row = 14,
+                           column = 0,
+                           columnspan = 2,
+                           sticky = "W",
+                           padx = 10)
+        revert_button.bind("<Enter>", command = lambda event : revert_button.configure(fg_color = "#4E0707"))
+        revert_button.bind("<Leave>", command = lambda event : revert_button.configure(fg_color = "red"))
+        
+    
+        
+    def train_button_func(self):
+        os.makedirs(f"{self.folder_combo_box.get()}/train/images")
+        for root, dirs, files in os.walk(self.folder_combo_box.get()):
+            for file in files:
+                if file.lower().endswith((".txt")):
+                    print(file.lower())
+                else:
+                    pass
+            # for file in files:
+            #     if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+            #         if os.path.exists(path = f"{self.combo_box.get()}/{os.path.splitext(file)[0]}.txt"):
+            #             self.tree_image_list.insert('', 'end', value = (file,"True"))
+            #         else:
+            #             self.tree_image_list.insert("", "end", values = (file, ""))
+    
+    def revert_button_func(self):
+        shutil.rmtree(f"{self.folder_combo_box.get()}/train")
                                             
     def get_folder(self):
         workspace_path = os.listdir()
@@ -263,7 +298,10 @@ class Train_page(customtkinter.CTkFrame):
     def slider_proportion(self):
         self.valid_test_slider.configure(from_ = 0,
                                          to = 100 - self.slider_train_test_variable.get())
-
+        self.model_combo_box.set("Select")
+        self.folder_combo_box.set("Select")
+        
+    
 
 ### -> Upload Page Class
 class Upload_page(customtkinter.CTkFrame):
@@ -306,7 +344,7 @@ class Upload_page(customtkinter.CTkFrame):
 
         #### -> ฟังก์ชันสำหรับเลือก File
     def select_file(self):
-        filetypes = [["All", "*.*"], ["zip files", "*.zip"], ["rar file", "*.rar"]]
+        filetypes = [["zip files", "*.zip"], ["rar file", "*.rar"]]
         zip_file_path = fd.askopenfilename(title = "Open File Name",
                                             initialdir = "/",
                                             filetypes = filetypes)
@@ -617,7 +655,7 @@ class Label_page(customtkinter.CTkFrame):
             new_height = int(image.height * ratio)
 
             # ปรับขนาดของภาพ
-            resized_image = image.resize((new_width, new_height), Image.LANCZOS)
+            resized_image = image.resize((new_width, new_height), Image.BICUBIC)
             self.image = ImageTk.PhotoImage(resized_image)
             print(f"width = {resized_image.width}, height = {resized_image.height}")
             self.resized_image_width = resized_image.width
@@ -728,6 +766,7 @@ class Label_page(customtkinter.CTkFrame):
         self.select_tag_combo_box = ttk.Combobox(master = self.top,
                                                  state = "readonly",
                                                  height = 20)
+        
         self.select_tag_combo_box.set(value = "Select")
         self.select_tag_combo_box.pack(pady = 10)
 
