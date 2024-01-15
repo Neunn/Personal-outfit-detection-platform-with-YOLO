@@ -1,3 +1,10 @@
+"""
+    Import Library
+    โดยส่วนนี้ Library ที่เราใช้เป็นหลักคือ customtkinter, tkinter เหตุผลที่ใช้ customtkinter เพราะว่ามันสามารถปรับแต่งได้เยอะยกตัวอย่างเช่น attribute corner_radius ที่สามารถปรับความมนของขอบได้
+    Library yaml สำหรับ อ่าน เขียน ไฟล์ .yaml
+    Library patoolib สำหรับแตกไฟล์จำพวก file .zip .rar
+    Library shutil ใช้สำหรับ remove tree file
+"""
 import customtkinter
 import tkinter
 from tkinter import ttk
@@ -13,11 +20,12 @@ class Home_page(customtkinter.CTkFrame):
         super().__init__(master = parent, fg_color = "white")
         
         """
-        Content Inside
+        ส่วนประกอบหลักๆคือ
         ประกอบด้วย
         - top_frame : สำหรับคำ Welcome
         - second_frame : เนื้อหาการใช้งาน
         """
+
         # top_frame
         top_frame = customtkinter.CTkFrame(master = self,
                                            fg_color = "transparent")
@@ -72,11 +80,9 @@ class Home_page(customtkinter.CTkFrame):
 class Train_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color= "white")
-
-
         
         """
-        Content Inside
+        หน้านี้เป็นเนื้อหาหลัก
         """
 
         inside_frame = customtkinter.CTkFrame(master = self,
@@ -301,8 +307,6 @@ class Train_page(customtkinter.CTkFrame):
         self.model_combo_box.set("Select")
         self.folder_combo_box.set("Select")
         
-    
-
 ### -> Upload Page Class
 class Upload_page(customtkinter.CTkFrame):
     def __init__(self, parent):
@@ -310,8 +314,10 @@ class Upload_page(customtkinter.CTkFrame):
 
         """
         Content Inside
-        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File (วางแผนไว้ว่าเป็นไฟล์ .zip, .rar)
+        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File โดยไฟล์ที่อัปโหลดอาจจะเป็น
         """
+
+        # เป็นกรอบ Frame ภายใน โดย expand = True คือการขยาย widget ของเรา 
         inside_frame = customtkinter.CTkFrame(master = self,
                                               corner_radius = 20,
                                               fg_color = "#D2DBE0")
@@ -320,6 +326,10 @@ class Upload_page(customtkinter.CTkFrame):
                           pady = 30,
                           expand = True,
                           fill = "both")
+        
+        """
+        ปุ่ม upload โดยปุ่ม upload จะมี function หลักๆอยู่ คือ ฟังก์ชันที่จะทำให้ปุ่มนั้นเมื่อนำเมาส์ไปวางแล้วเปลี่ยนสีเป็นสีเป็นสีหนึ่งเมื่อนำเมาส์ออกแล้วสีจะเปลี่ยนกลับมาเป็นสีเดิม อีกฟังก์ชันนึงคือฟังก์ชันที่จะทำให้เวลากดปุ่มจะเด้งหน้าต่าง ให้เลือกอัปโหลดไฟล์ .zip, .rar
+        """
         self.upload_button = customtkinter.CTkButton(master = inside_frame,
                                                     text = "Open Your File .zip",
                                                     compound = "top",
@@ -331,32 +341,37 @@ class Upload_page(customtkinter.CTkFrame):
                                                     corner_radius = 100,
                                                     width = 500,
                                                     height = 500,
-                                                    command = lambda : self.select_file())
+                                                    command = lambda : self.select_file()) ### self.select_file คือ function ที่อยู่ภายใน Class นี้ ฟังก์ชันที่อยู่ใน Class เราจะเรียกว่า method โดย method self.select_file จะทำงานเมื่อเรากดปุ่ม 
         self.upload_button.pack(side = "top", expand = True)
-        self.upload_button.bind("<Enter>", command = lambda event : self._on_enter())
-        self.upload_button.bind("<Leave>", command = lambda event : self._on_leave())
 
-        #### -> ฟังก์ชันสำหรับทำให้ตัวหนังสือเปลี่ยนสี
-    def _on_enter(self):
-        self.upload_button.configure(text_color = "white", fg_color = "#232F34")
-    def _on_leave(self):
-        self.upload_button.configure(text_color = "black", fg_color = "transparent")
+        # สองบรรทัดข้างล่างนี้เป็นการ bind ปุ่มเวลาที่เรานำ pointer (เมาส์) ไปชี้หรือทำอะไรก็ตามกับปุ่มตามฟังก์ชันที่เราตั้งค่าไว้โดยในที่นี้เป็นการใช้ <Enter> และ <Leave> โดยที่ <Enter> คือมื่อนำ pointer เข้าไปในบริเวณวิดเจ็ตของปุ่ม ส่วน <Leave> คือการนำ pointer ออกมาบริเวณนอกวิดเจ็ตนั่นเอง
+        self.upload_button.bind("<Enter>", command = lambda event : self.upload_button.configure(text_color = "white",
+                                                                                             fg_color = "#232F34"))
+        self.upload_button.bind("<Leave>", command = lambda event : self.upload_button.configure(text_color = "black",
+                                                                                             fg_color = "transparent"))
 
         #### -> ฟังก์ชันสำหรับเลือก File
     def select_file(self):
-        filetypes = [["zip files", "*.zip"], ["rar file", "*.rar"]]
+        """
+            ฟังก์ชันสำหรับเลือกไฟล์ที่เราจะทำการอัปโหลดในตอนนี้เป็น file ที่มีนามสกุลเป็น .zip, .rar และแตกไฟล์อัตโนมัติ
+        """
+
+        filetypes = [["zip files", "*.zip"], ["rar file", "*.rar"]]     # สร้าง list สำหรับประเภทของไฟล์ และคำที่จะใช้แสดง
+
+        # สร้างหน้าต่างสำหรับการค้นหาไฟล์ โดยค่าที่ได้เราจะได้เป็น path ของไฟล์มาเก็บไว้ในตัวแปร zip_fil_path
         zip_file_path = fd.askopenfilename(title = "Open File Name",
                                             initialdir = "/",
                                             filetypes = filetypes)
         
         
-            # ตรวจสอบว่าไฟล์ .zip มีอยู่จริงหรือไม่
+        # ตรวจสอบว่าไฟล์ .zip มีอยู่จริงหรือไม่ หากมีก็ให้ผ่านไป แต่ หากไม่มีจะขึ้นโชว์หน้าต่าง Error ให้ขึ้นเลือกไฟล์ zip ใหม่แล้วจะเด้งออกจากฟังก์ชัน ด้วย return
         if not zip_file_path:
             tkinter.messagebox.showerror(title = "Error",
                                          message = "Please Select A Zip File!")
-            return
+            return # <- เด้งออกจากฟังก์ชัน self.select_file
         
-            # Check ว่าใน workspace ของเรามี Folder ที่ชื่อ Image อยู่รึไม่
+
+        # ต่อมาเราจะทำการแตกไฟล์ .zip, .rar ที่เราเลือกมา โดยขั้นแรกให้ทำการตรวจสอบใน workspace ของเราก่อนว่ามีโฟล์เดอร์ที่ขึ้นต้นด้วย Image_ ไหม หากมี ให้
         folder_name = "Image_1"
         counter = 2
         while os.path.exists(path = folder_name):
