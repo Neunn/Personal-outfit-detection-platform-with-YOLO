@@ -273,13 +273,43 @@ class Train_page(customtkinter.CTkFrame):
     
         
     def train_button_func(self):
-        os.makedirs(f"{self.folder_combo_box.get()}/train/images")
+
+        train_percent = self.slider_train_test_variable.get()
+        print(f"train_percent = {train_percent}")
+        test_percent = self.slider_valid_test_variable.get()
+        print(f"test_percent = {test_percent}")
+        valid_percent = (100 - train_percent) - test_percent
+
+        files_count = 0
+
         for root, dirs, files in os.walk(self.folder_combo_box.get()):
-            for file in files:
-                if file.lower().endswith((".txt")):
-                    print(file.lower())
-                else:
-                    pass
+            for file_element in files:
+                if file_element.lower().endswith((".txt")):
+                    files_count += 1
+        
+                    # shutil.copy2(src = f"{self.folder_combo_box.get()}/{os.path.splitext(file_element)[0]}.txt",
+                    #              dst = f"{self.folder_combo_box.get()}/train/labels")
+
+        test = os.listdir(path = f"{self.folder_combo_box.get()}")
+        del_list = ["data.yaml", "test", "train", "valid"]
+        for i in test:
+            if i in del_list:
+                test.remove(i)
+                
+        print(f"test = {test}")
+        
+                
+                    
+        os.makedirs(f"{self.folder_combo_box.get()}/train/images")
+        os.makedirs(f"{self.folder_combo_box.get()}/train/labels")
+        os.makedirs(f"{self.folder_combo_box.get()}/test/images")
+        os.makedirs(f"{self.folder_combo_box.get()}/test/labels")
+        os.makedirs(f"{self.folder_combo_box.get()}/valid/images")
+        os.makedirs(f"{self.folder_combo_box.get()}/valid/labels")
+                    
+
+
+        
             # for file in files:
             #     if file.lower().endswith(('.png', '.jpg', '.jpeg')):
             #         if os.path.exists(path = f"{self.combo_box.get()}/{os.path.splitext(file)[0]}.txt"):
@@ -289,6 +319,8 @@ class Train_page(customtkinter.CTkFrame):
     
     def revert_button_func(self):
         shutil.rmtree(f"{self.folder_combo_box.get()}/train")
+        shutil.rmtree(f"{self.folder_combo_box.get()}/test")
+        shutil.rmtree(f"{self.folder_combo_box.get()}/valid")
                                             
     def get_folder(self):
         workspace_path = os.listdir()
