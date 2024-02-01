@@ -290,30 +290,29 @@ class Train_page(customtkinter.CTkFrame):
         for i in file_list:
             if i.endswith(".txt"):
                 txt_list.append(i)
-            for j in txt_list:
-                if os.path.splitext(p = i)[0] == os.path.splitext(p = j)[0]:
+            elif i.endswith((".png", ".jpg")):
+                print(f"{self.folder_combo_box.get()}/{os.path.splitext(i)[0]}.txt")
+                if os.path.exists(path = f"{self.folder_combo_box.get()}/{os.path.splitext(i)[0]}.txt"):
                     img_list.append(i)
-                else:
-                    pass
+            else:
+                print("Error ไรวะ")
+        
         
 
-        # for root, dirs, files in os.walk(self.folder_combo_box.get()):
-        #     for file_element in files:
-        #         if file_element.lower().endswith((".txt")):
-        #             txt_list.append(file_element)
-        #             for i in file_list:
-        #                 if (i.endswith((".png", ".jpeg"))) and (os.path.splitext(p = i)[0] == os.path.splitext(p = file_element)[0]):
-        #                     img_list.append(i)
-        #                     break
-                    
-        #             files_count += 1
-                    
-        print(f"txt_list = {txt_list}")
-        print(f"len(txt_list) = {len(txt_list)}")
+        # print(f"txt_list = {txt_list}")
+        # print(f"len(txt_list) = {len(txt_list)}")
+        # print(f"#############################################################")
+        # print(f"img_list = {img_list}")
+        # print(f"len(img_list) = {len(img_list)}")
         print(f"#############################################################")
-        print(f"img_list = {img_list}")
-        print(f"len(img_list) = {len(img_list)}")
-        print(f"#############################################################")
+        print("")
+
+        for i in range(len(txt_list)):
+            if os.path.splitext(p = txt_list[i])[0] == os.path.splitext(p = img_list[i])[0]:
+                print(i)
+                print(True)
+            else:
+                print(False)
 
                     # shutil.copy2(src = f"{self.folder_combo_box.get()}/{os.path.splitext(file_element)[0]}.txt",
                     #              dst = f"{self.folder_combo_box.get()}/train/labels")
