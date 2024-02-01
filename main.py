@@ -279,33 +279,52 @@ class Train_page(customtkinter.CTkFrame):
         test_percent = self.slider_valid_test_variable.get()
         print(f"test_percent = {test_percent}")
         valid_percent = (100 - train_percent) - test_percent
+        print(f"valid_percent = {valid_percent}")
+       
+        txt_list = []
+        img_list = []
 
-        files_count = 0
+        file_list = os.listdir(path = f"{self.folder_combo_box.get()}")
 
-        for root, dirs, files in os.walk(self.folder_combo_box.get()):
-            for file_element in files:
-                if file_element.lower().endswith((".txt")):
-                    files_count += 1
+
+        for i in file_list:
+            if i.endswith(".txt"):
+                txt_list.append(i)
+            for j in txt_list:
+                if os.path.splitext(p = i)[0] == os.path.splitext(p = j)[0]:
+                    img_list.append(i)
+                else:
+                    pass
         
+
+        # for root, dirs, files in os.walk(self.folder_combo_box.get()):
+        #     for file_element in files:
+        #         if file_element.lower().endswith((".txt")):
+        #             txt_list.append(file_element)
+        #             for i in file_list:
+        #                 if (i.endswith((".png", ".jpeg"))) and (os.path.splitext(p = i)[0] == os.path.splitext(p = file_element)[0]):
+        #                     img_list.append(i)
+        #                     break
+                    
+        #             files_count += 1
+                    
+        print(f"txt_list = {txt_list}")
+        print(f"len(txt_list) = {len(txt_list)}")
+        print(f"#############################################################")
+        print(f"img_list = {img_list}")
+        print(f"len(img_list) = {len(img_list)}")
+        print(f"#############################################################")
+
                     # shutil.copy2(src = f"{self.folder_combo_box.get()}/{os.path.splitext(file_element)[0]}.txt",
                     #              dst = f"{self.folder_combo_box.get()}/train/labels")
 
-        test = os.listdir(path = f"{self.folder_combo_box.get()}")
-        del_list = ["data.yaml", "test", "train", "valid"]
-        for i in test:
-            if i in del_list:
-                test.remove(i)
-                
-        print(f"test = {test}")
-        
-                
-                    
-        os.makedirs(f"{self.folder_combo_box.get()}/train/images")
-        os.makedirs(f"{self.folder_combo_box.get()}/train/labels")
-        os.makedirs(f"{self.folder_combo_box.get()}/test/images")
-        os.makedirs(f"{self.folder_combo_box.get()}/test/labels")
-        os.makedirs(f"{self.folder_combo_box.get()}/valid/images")
-        os.makedirs(f"{self.folder_combo_box.get()}/valid/labels")
+                            
+        # os.makedirs(f"{self.folder_combo_box.get()}/train/images")
+        # os.makedirs(f"{self.folder_combo_box.get()}/train/labels")
+        # os.makedirs(f"{self.folder_combo_box.get()}/test/images")
+        # os.makedirs(f"{self.folder_combo_box.get()}/test/labels")
+        # os.makedirs(f"{self.folder_combo_box.get()}/valid/images")
+        # os.makedirs(f"{self.folder_combo_box.get()}/valid/labels")
                     
 
 
