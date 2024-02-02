@@ -1,11 +1,11 @@
 import customtkinter
 import tkinter
 from tkinter import ttk
-from PIL import Image, ImageTk
-from tkinter import filedialog as fd
-import os, shutil
-import patoolib
-import yaml
+# from PIL import Image, ImageTk
+# from tkinter import filedialog as fd
+# import os, shutil
+# import patoolib
+# import yaml
 
 class Report_page(customtkinter.CTkFrame):
     def __init__(self, parent):

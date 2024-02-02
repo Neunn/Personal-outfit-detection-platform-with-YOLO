@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 from tkinter import filedialog as fd
 import os, shutil
 import patoolib
-import yaml
+# import yaml
 
 class Upload_page(customtkinter.CTkFrame):
     def __init__(self, parent):

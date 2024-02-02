@@ -9,10 +9,10 @@ import customtkinter
 import tkinter
 from tkinter import ttk
 from PIL import Image, ImageTk
-from tkinter import filedialog as fd
-import os, shutil
-import patoolib
-import yaml
+# from tkinter import filedialog as fd
+# import os, shutil
+# import patoolib
+# import yaml
 from home_page import Home_page
 from train_page import Train_page
 from label_page import Label_page

@@ -1,12 +1,13 @@
 import customtkinter
 import tkinter
 from tkinter import ttk
-from PIL import Image, ImageTk
-from tkinter import filedialog as fd
+# from PIL import Image, ImageTk
+# from tkinter import filedialog as fd
 import os, shutil
-import patoolib
+# import patoolib
 import yaml
 import numpy as np
+from ultralytics import YOLO
 
 ### -> Train Page Class (กำลังทำ)
 class Train_page(customtkinter.CTkFrame):
@@ -159,7 +160,9 @@ class Train_page(customtkinter.CTkFrame):
         folder_list = self.get_folder()
         self.folder_combo_box.configure(values = folder_list)
 
-        self.entry_epoch = customtkinter.CTkEntry(master = inside_frame)
+        self.entry_epoch = customtkinter.CTkEntry(master = inside_frame,
+                                                  validate = "key",
+                                                  validatecommand=(inside_frame.register(self.validate_entry), "%S"))
         self.entry_epoch.grid(row = 10, 
                          column = 0,
                          sticky = "WE",
@@ -173,7 +176,9 @@ class Train_page(customtkinter.CTkFrame):
                               stick = "W",
                               padx = 10)
 
-        self.batch_size_entry = customtkinter.CTkEntry(master=inside_frame)
+        self.batch_size_entry = customtkinter.CTkEntry(master=inside_frame,
+                                                  validate = "key",
+                                                  validatecommand=(inside_frame.register(self.validate_entry), "%S"))
         self.batch_size_entry.grid(row = 12,
                                    column = 0,
                                    stick = "WE",
@@ -281,14 +286,30 @@ class Train_page(customtkinter.CTkFrame):
         with open(file = f"{self.folder_combo_box.get()}/data.yaml", mode = "r") as read_file:
             data = yaml.safe_load(read_file)
             print(f"data = {data}")
-            data["train"] = f"{self.folder_combo_box.get()}/train/images"
-            data["test"] = f"{self.folder_combo_box.get()}/test/images"
-            data["val"] = f"{self.folder_combo_box.get()}/valid/images"
+            data["train"] = os.path.abspath(f"{self.folder_combo_box.get()}/train/images")
+            data["test"] = os.path.abspath(f"{self.folder_combo_box.get()}/test/images")
+            data["val"] = os.path.abspath(f"{self.folder_combo_box.get()}/valid/images")
 
         with open(file = f"{self.folder_combo_box.get()}/data.yaml", mode = "w") as write_file:
             yaml.dump(data,write_file)
 
-                            
+        self.train_model(yaml_path = f"{self.folder_combo_box.get()}/data.yaml",
+                         model_type = self.model_combo_box.get(),
+                         epochs = int(self.entry_epoch.get()),
+                         batch_size = int(self.batch_size_entry.get()))
+        
+
+    def validate_entry(self, text):
+        return text.isdecimal()
+    
+
+    
+    def train_model(self, yaml_path, model_type, epochs, batch_size):
+        model = YOLO(model = model_type)
+        model.train(data = yaml_path, 
+                    epochs = epochs,
+                    batch = batch_size)
+
     
     def revert_button_func(self):
         shutil.rmtree(f"{self.folder_combo_box.get()}/train")
@@ -317,8 +338,6 @@ class Train_page(customtkinter.CTkFrame):
     def slider_proportion(self):
         self.valid_test_slider.configure(from_ = 0,
                                          to = 100 - self.slider_train_test_variable.get())
-        # self.model_combo_box.set("Select")
-        # self.folder_combo_box.set("Select")
 
 
     def copy2folder(self, val_array, des):
