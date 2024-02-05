@@ -283,6 +283,7 @@ class Train_page(customtkinter.CTkFrame):
         self.copy2folder(val_array = valid_txt_array,
                          des = f"{self.folder_combo_box.get()}/valid/labels")
         
+
         with open(file = f"{self.folder_combo_box.get()}/data.yaml", mode = "r") as read_file:
             data = yaml.safe_load(read_file)
             print(f"data = {data}")
@@ -296,7 +297,8 @@ class Train_page(customtkinter.CTkFrame):
         self.train_model(yaml_path = f"{self.folder_combo_box.get()}/data.yaml",
                          model_type = self.model_combo_box.get(),
                          epochs = int(self.entry_epoch.get()),
-                         batch_size = int(self.batch_size_entry.get()))
+                         batch_size = int(self.batch_size_entry.get()),
+                         project_path = f"{self.folder_combo_box.get()}/runs")
         
 
     def validate_entry(self, text):
@@ -304,26 +306,39 @@ class Train_page(customtkinter.CTkFrame):
     
 
     
-    def train_model(self, yaml_path, model_type, epochs, batch_size):
-        model = YOLO(model = model_type)
-        model.train(data = yaml_path, 
-                    epochs = epochs,
-                    batch = batch_size)
+    def train_model(self, yaml_path, model_type, epochs, batch_size, project_path):
+        if os.path.exists(path = f"{self.folder_combo_box.get()}/{model_type}"):
+            model = YOLO(model = f"{self.folder_combo_box.get()}/{model_type}")
+            model.train(data = yaml_path, 
+                        epochs = epochs,
+                        batch = batch_size,
+                        project = project_path)
+        
+        else:
+            model = YOLO(model = model_type)
+            model.train(data = yaml_path, 
+                        epochs = epochs,
+                        batch = batch_size,
+                        project = project_path)
+            shutil.move(src = f"{model_type}", dst = f"{self.folder_combo_box.get()}/{model_type}")
 
     
     def revert_button_func(self):
         shutil.rmtree(f"{self.folder_combo_box.get()}/train")
         shutil.rmtree(f"{self.folder_combo_box.get()}/test")
         shutil.rmtree(f"{self.folder_combo_box.get()}/valid")
-
+        shutil.rmtree(f"{self.folder_combo_box.get()}/runs")
+        os.remove(path = f"{self.folder_combo_box.get()}/{self.model_combo_box.get()}")
+        
         with open(file = f"{self.folder_combo_box.get()}/data.yaml", mode = "r") as read_file:
             data = yaml.safe_load(read_file)
             del data["train"], data["test"], data["val"]
         with open(file = f"{self.folder_combo_box.get()}/data.yaml", mode = "w") as write_file:
             yaml.dump(data, write_file)
 
-        del read_file, write_file
-                                            
+        del read_file, write_file, data
+
+
     def get_folder(self):
         workspace_path = os.listdir()
         folder_list = []
@@ -334,7 +349,7 @@ class Train_page(customtkinter.CTkFrame):
                 pass
         return folder_list
         
-        
+
     def slider_proportion(self):
         self.valid_test_slider.configure(from_ = 0,
                                          to = 100 - self.slider_train_test_variable.get())
