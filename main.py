@@ -138,7 +138,8 @@ class main(customtkinter.CTk):
         frame = page_class(parent = self.main_page)
         frame.pack(fill = "both",
                    expand = True)
-
+        
+        
 ### -> Run Application app
 main(title = "Personal outfit detection platform with YOLO", 
      height = 1500, 
