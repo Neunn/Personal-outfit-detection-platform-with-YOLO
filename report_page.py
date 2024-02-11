@@ -65,7 +65,6 @@ class Report_page(customtkinter.CTkFrame):
         dashboard_zone.columnconfigure(index = 3, weight = 25)
         
         self.label_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                               bg = "white",
                                                height = 400)
         self.label_canvas.grid(row = 0,
                           column = 0,
@@ -74,7 +73,6 @@ class Report_page(customtkinter.CTkFrame):
                           pady = 5)
         
         self.p_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                 bg = "white",
                                                  height = 400)
         self.p_curve_canvas.grid(row = 0, 
                             column = 1,
@@ -83,7 +81,6 @@ class Report_page(customtkinter.CTkFrame):
                             pady = 5)
         
         self.pr_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                 bg = "white",
                                                  height = 400)
         self.pr_curve_canvas.grid(row = 0, 
                             column = 2,
@@ -92,7 +89,6 @@ class Report_page(customtkinter.CTkFrame):
                             pady = 5)
         
         self.r_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                 bg = "white",
                                                  height = 400)
         self.r_curve_canvas.grid(row = 0, 
                             column = 3,
@@ -101,7 +97,6 @@ class Report_page(customtkinter.CTkFrame):
                             pady = 5)
         
         self.confusion_matrix_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                          bg = "white",
                                                           height = 700)
         self.confusion_matrix_canvas.grid(row = 1,
                                      column = 0,
@@ -111,7 +106,6 @@ class Report_page(customtkinter.CTkFrame):
                                      pady = 5)
         
         self.result_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                               bg = "white",
                                                height = 700)
         self.result_canvas.grid(row = 1, 
                           column = 2,
@@ -121,7 +115,6 @@ class Report_page(customtkinter.CTkFrame):
                           pady = 5)
         
         self.pred_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                              bg = "white",
                                               height = 1000)
         self.pred_canvas.grid(row = 2,
                          column = 0,
@@ -148,6 +141,16 @@ class Report_page(customtkinter.CTkFrame):
         self.result_canvas.delete("all")
         self.pred_canvas.delete("all")
 
+        self.label_canvas.configure(bg = "white")
+        self.p_curve_canvas.configure(bg = "white")
+        self.pr_curve_canvas.configure(bg = "white")
+        self.r_curve_canvas.configure(bg = "white")
+        self.confusion_matrix_canvas.configure(bg = "white")
+        self.result_canvas.configure(bg = "white")
+        self.pred_canvas.configure(bg = "white")
+
+
+
         label_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/labels.jpg")
         self.label_canvas.bind("<Button-1>",
                                func = lambda event : self.full_screen_image(image_import=label_image,
@@ -166,7 +169,7 @@ class Report_page(customtkinter.CTkFrame):
 
         pr_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/PR_curve.png")
         self.pr_curve_canvas.bind("<Button-1>",
-                                  func = lambda event : self.full_screen_image(image_import = p_curve_image,
+                                  func = lambda event : self.full_screen_image(image_import = pr_curve_image,
                                                                                title_name = f"PR_curve.png"))
         self.ratio_canvas(canvas_element = self.pr_curve_canvas,
                           image_import = pr_curve_image)
@@ -228,19 +231,24 @@ class Report_page(customtkinter.CTkFrame):
     def full_screen_image(self, image_import : object, title_name : str):
         top_level = customtkinter.CTkToplevel()
         top_level.title(f"{title_name}")
-        image_import = ImageTk.PhotoImage(image = image_import)
-        print("image_import.height() =", image_import.height())
-        top_level.geometry(f"{image_import.height()}x{image_import.width()}")
-        # top_level.resizable(width = False,
-        #                     height = False)
-        image_zone = customtkinter.CTkCanvas(master = top_level,
-                                             height = 1000)
-        image_zone.pack(expand = True,
-                        fill = "both",
-                        side = "top")
-        image_zone.create_image(0,
-                                0,
-                                anchor = "nw",
-                                image = image_import)
-        image_zone.image = image_import
+        top_level.geometry("600x600")
+        top_level.after(ms = 250, 
+                        func = lambda : top_level.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
+
+        self.background_image_copy = image_import.copy()
+        background_image = ImageTk.PhotoImage(image_import)
+
+        self.background = tkinter.Label(master = top_level,
+                                         image = background_image)
+        self.background.pack(expand = True,
+                              fill = "both")
+        self.background.bind("<Configure>", func = self._resize_image)
+
+    def _resize_image(self, event):
+        new_width = event.width
+        new_height = event.height
         
+        resize_image = self.background_image_copy.resize((new_width, new_height))
+
+        background_image = ImageTk.PhotoImage(image = resize_image)
+        self.background.configure(image = background_image)

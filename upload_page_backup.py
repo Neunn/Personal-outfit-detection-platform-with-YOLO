@@ -1,85 +1,60 @@
-import customtkinter
-import tkinter
+import tkinter as tk
 from tkinter import ttk
-from PIL import Image, ImageTk
-from tkinter import filedialog as fd
-import os, shutil
-import patoolib
-# import yaml
+from ultralytics import YOLO
 
-class Upload_page(customtkinter.CTkFrame):
-    def __init__(self, parent):
-        super().__init__(master = parent, fg_color = "white")
 
-        """
-        Content Inside
-        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File โดยไฟล์ที่อัปโหลดอาจจะเป็น
-        """
+# กำหนดค่าเริ่มต้น
+epochs = 100
+batch_size = 32
 
-        # เป็นกรอบ Frame ภายใน โดย expand = True คือการขยาย widget ของเรา 
-        inside_frame = customtkinter.CTkFrame(master = self,
-                                              corner_radius = 20,
-                                              fg_color = "#D2DBE0")
-        inside_frame.pack(side = "top",
-                          padx = 20,
-                          pady = 30,
-                          expand = True,
-                          fill = "both")
-        
-        """
-        ปุ่ม upload โดยปุ่ม upload จะมี function หลักๆอยู่ คือ ฟังก์ชันที่จะทำให้ปุ่มนั้นเมื่อนำเมาส์ไปวางแล้วเปลี่ยนสีเป็นสีเป็นสีหนึ่งเมื่อนำเมาส์ออกแล้วสีจะเปลี่ยนกลับมาเป็นสีเดิม อีกฟังก์ชันนึงคือฟังก์ชันที่จะทำให้เวลากดปุ่มจะเด้งหน้าต่าง ให้เลือกอัปโหลดไฟล์ .zip, .rar
-        """
-        self.upload_button = customtkinter.CTkButton(master = inside_frame,
-                                                    text = "Open Your File .zip",
-                                                    compound = "top",
-                                                    image = customtkinter.CTkImage(Image.open(fp = r"Icon_image/Upload_icon.png"),
-                                                                                size = (100, 100)),
-                                                    font = ("Calibri Bold", 40),
-                                                    text_color = "black",
-                                                    fg_color = "transparent",
-                                                    corner_radius = 100,
-                                                    width = 500,
-                                                    height = 500,
-                                                    command = lambda : self.select_file()) ### self.select_file คือ function ที่อยู่ภายใน Class นี้ ฟังก์ชันที่อยู่ใน Class เราจะเรียกว่า method โดย method self.select_file จะทำงานเมื่อเรากดปุ่ม 
-        self.upload_button.pack(side = "top", expand = True)
+# สร้างหน้าต่างหลัก
+window = tk.Tk()
+window.title("YOLOv8 Training Progress")
 
-        # สองบรรทัดข้างล่างนี้เป็นการ bind ปุ่มเวลาที่เรานำ pointer (เมาส์) ไปชี้หรือทำอะไรก็ตามกับปุ่มตามฟังก์ชันที่เราตั้งค่าไว้โดยในที่นี้เป็นการใช้ <Enter> และ <Leave> โดยที่ <Enter> คือมื่อนำ pointer เข้าไปในบริเวณวิดเจ็ตของปุ่ม ส่วน <Leave> คือการนำ pointer ออกมาบริเวณนอกวิดเจ็ตนั่นเอง
-        self.upload_button.bind("<Enter>", command = lambda event : self.upload_button.configure(text_color = "white",
-                                                                                             fg_color = "#232F34"))
-        self.upload_button.bind("<Leave>", command = lambda event : self.upload_button.configure(text_color = "black",
-                                                                                             fg_color = "transparent"))
+# สร้างป้ายชื่อ
+label_epochs = tk.Label(text="Epochs:")
+label_epochs.pack()
 
-        #### -> ฟังก์ชันสำหรับเลือก File
-    def select_file(self):
-        """
-            ฟังก์ชันสำหรับเลือกไฟล์ที่เราจะทำการอัปโหลดในตอนนี้เป็น file ที่มีนามสกุลเป็น .zip, .rar และแตกไฟล์อัตโนมัติ
-        """
+# สร้างแถบเลื่อนสำหรับจำนวน epoch
+epoch_slider = tk.Scale(window, from_=1, to=200, orient=tk.HORIZONTAL, value=epochs)
+epoch_slider.pack()
 
-        filetypes = [["zip files", "*.zip"], ["rar file", "*.rar"]]     # สร้าง list สำหรับประเภทของไฟล์ และคำที่จะใช้แสดง
+# สร้างป้ายชื่อ
+label_batch_size = tk.Label(text="Batch Size:")
+label_batch_size.pack()
 
-        # สร้างหน้าต่างสำหรับการค้นหาไฟล์ โดยค่าที่ได้เราจะได้เป็น path ของไฟล์มาเก็บไว้ในตัวแปร zip_fil_path
-        zip_file_path = fd.askopenfilename(title = "Open File Name",
-                                            initialdir = "/",
-                                            filetypes = filetypes)
-        
-        
-        # ตรวจสอบว่าไฟล์ .zip มีอยู่จริงหรือไม่ หากมีก็ให้ผ่านไป แต่ หากไม่มีจะขึ้นโชว์หน้าต่าง Error ให้ขึ้นเลือกไฟล์ zip ใหม่แล้วจะเด้งออกจากฟังก์ชัน ด้วย return
-        if not zip_file_path:
-            tkinter.messagebox.showerror(title = "Error",
-                                         message = "Please Select A Zip File!")
-            return # <- เด้งออกจากฟังก์ชัน self.select_file
-        
+# สร้างแถบเลื่อนสำหรับขนาดชุดข้อมูล
+batch_size_slider = tk.Scale(window, from_=1, to=64, orient=tk.HORIZONTAL, value=batch_size)
+batch_size_slider.pack()
 
-        # ต่อมาเราจะทำการแตกไฟล์ .zip, .rar ที่เราเลือกมา โดยขั้นแรกให้ทำการตรวจสอบใน workspace ของเราก่อนว่ามีโฟล์เดอร์ที่ขึ้นต้นด้วย Image_ ไหม หากมี ให้
-        folder_name = "Image_1"
-        counter = 2
-        while os.path.exists(path = folder_name):
-            folder_name = f"Image_{counter}"
-            counter += 1
-        os.makedirs(name = folder_name)
+# สร้างปุ่มเริ่มต้นการฝึกอบรม
+button_start_training = tk.Button(text="Start Training")
+button_start_training.pack()
 
-            # เปิด File Zip และ แตกไฟล์ใน Folder Image แต่ละครั้ง
-        patoolib.extract_archive(zip_file_path, outdir = folder_name)
+# สร้างแถบความคืบหน้า
+progress_bar = ttk.Progressbar(window, orient=tk.HORIZONTAL, mode='determinate', length=200)
+progress_bar.pack()
 
-        tkinter.messagebox.showinfo(title = "Succesful", 
-                                    message = "Upload Successfully")
+# ฟังก์ชันสำหรับเริ่มต้นการฝึกอบรม
+def start_training():
+    # รับค่าจากแถบเลื่อน
+    epochs = epoch_slider.get()
+    batch_size = batch_size_slider.get()
+
+    # เริ่มต้นการฝึกอบรมโมเดล YOLOv8
+    model = YOLO("yolov8n.pt")
+    model.train(data = r"C:\Users\ExpertBook\Desktop\WorkSpace\University\Year 3\เทอม 2\PRE-PROJECT\WorkSpace\Image_1\data.yaml",
+                epochs = epochs,
+                batch = batch_size)
+
+
+    # อัปเดตแถบความคืบหน้า
+    for epoch in range(epochs):
+        progress_bar.step()
+        window.update()
+
+# กำหนดเหตุการณ์คลิกสำหรับปุ่มเริ่มต้นการฝึกอบรม
+button_start_training.config(command=start_training)
+
+# เรียกใช้mainloop() เพื่อแสดงหน้าต่าง
+window.mainloop()

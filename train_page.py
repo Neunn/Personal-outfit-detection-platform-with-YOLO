@@ -66,6 +66,30 @@ class Train_page(customtkinter.CTkFrame):
                              padx = 10,
                              pady = 10)
         
+
+        folder_select_label = customtkinter.CTkLabel(master = inside_frame,
+                                                     text = "Folder Select",
+                                                     font = ("Calibri Light", 16))
+        folder_select_label.grid(row = 1,
+                                 column = 1,
+                                 sticky = "W",
+                                 padx = 10)
+        
+        self.folder_combo_box = customtkinter.CTkComboBox(master = inside_frame,
+                                                          state = "readonly")
+        self.folder_combo_box.set("Select")
+        self.folder_combo_box.grid(row = 2,
+                              column = 1,
+                              columnspan = 2, 
+                              padx = 5,
+                              sticky = "WE")
+        
+        folder_list = self.get_folder()
+        self.folder_combo_box.configure(values = folder_list)
+
+
+
+
         train_test_label = customtkinter.CTkLabel(master = inside_frame, 
                                                     text = "Train / Test %",
                                                     font = ("Calibri Light", 16))
@@ -140,25 +164,7 @@ class Train_page(customtkinter.CTkFrame):
                          sticky = "W",
                          padx = 10)
         
-        folder_select_label = customtkinter.CTkLabel(master = inside_frame,
-                                                     text = "Folder Select",
-                                                     font = ("Calibri Light", 16))
-        folder_select_label.grid(row = 9,
-                                 column = 1,
-                                 sticky = "W",
-                                 padx = 10)
         
-        self.folder_combo_box = customtkinter.CTkComboBox(master = inside_frame,
-                                                     state = "readonly")
-        self.folder_combo_box.set("Select")
-        self.folder_combo_box.grid(row = 10,
-                              column = 1,
-                              columnspan = 2, 
-                              padx = 5,
-                              sticky = "WE")
-        
-        folder_list = self.get_folder()
-        self.folder_combo_box.configure(values = folder_list)
 
         self.entry_epoch = customtkinter.CTkEntry(master = inside_frame,
                                                   validate = "key",
@@ -204,9 +210,44 @@ class Train_page(customtkinter.CTkFrame):
                            columnspan = 2,
                            sticky = "W",
                            padx = 10)
+        
+        all_image_count_label = customtkinter.CTkLabel(master = inside_frame,
+                                                 text = "จำนวนรูปทั้งหมด : ",
+                                                 font = ("Calibri light", 13))
+        all_image_count_label.grid(row = 15,
+                             column = 0,
+                             sticky = "w",
+                             padx = 10)
+        train_count_label = customtkinter.CTkLabel(master = inside_frame,
+                                                   text = "จำนวนรูปที่ใช้ Train : ",
+                                                   font = ("Calibri light", 13))
+        train_count_label.grid(row = 16,
+                               column = 0,
+                               sticky = "w",
+                               padx = 10)
+        valid_count_label = customtkinter.CTkLabel(master = inside_frame,
+                                                   text = "จำนวนรูปที่ใช้ในการ Validate : ",
+                                                   font = ("Calibri light", 13))
+        valid_count_label.grid(row = 17,
+                               column = 0,
+                               sticky = "w",
+                               padx = 10)
+        test_count_label = customtkinter.CTkLabel(master = inside_frame,
+                                                  text = "จำนวนรูปที่ใช้ในการ Test : ",
+                                                  font = ("Calibri light", 13))
+        test_count_label.grid(row = 18,
+                              column = 0,
+                              sticky = "w",
+                              padx = 10)
+
+        
+
         revert_button.bind("<Enter>", command = lambda event : revert_button.configure(fg_color = "#4E0707"))
         revert_button.bind("<Leave>", command = lambda event : revert_button.configure(fg_color = "red"))
-        
+        self.folder_combo_box.bind("<<ComboboxSelected>>", command = lambda event : self._show_info())
+    
+    def _show_info(self):
+        pass
     
         
     def train_button_func(self):
