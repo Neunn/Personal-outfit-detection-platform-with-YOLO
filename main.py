@@ -95,11 +95,6 @@ class main(customtkinter.CTk):
         self.show_frame(page_class = Home_page)
         # self.bind("<Motion>", func = lambda event : print(f"x = {event.x} y = {event.y}"))
 
-        """
-        ให้มันรันวน loop ไปเรื่อยๆ
-        """
-        self.mainloop()
-    
 
     #### ฟังก์ชันสำหรับสร้างปุ่มแล้ว pack เข้าไปใน menu_zone
     def create_menu_button(self, name : str, menu_zone_frame : object, icon_path : str, icon_path_hover : str,
@@ -141,6 +136,7 @@ class main(customtkinter.CTk):
         
         
 ### -> Run Application app
-main(title = "Personal outfit detection platform with YOLO", 
-     height = 1500, 
-     width = 750)
+main_app = main(title = "Personal outfit detection platform with YOLO", 
+    height = 1500, 
+    width = 750)
+main_app.mainloop()

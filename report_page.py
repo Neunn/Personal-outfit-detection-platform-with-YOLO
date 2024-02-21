@@ -3,6 +3,7 @@ import tkinter
 from tkinter import ttk
 from PIL import Image, ImageTk
 import os, shutil
+from app_demo import Main_demo
 
 
 class Report_page(customtkinter.CTkFrame):
@@ -47,6 +48,15 @@ class Report_page(customtkinter.CTkFrame):
                               pady = 15)
         self.folder_combo_box.set(value = "Select")
         self.get_folder()
+
+        #### App demo
+        app_button = customtkinter.CTkButton(master = select_zone,
+                                             text =  "Try it out!",
+                                             font = ("Calibri Bold", 15),
+                                             command = lambda : Main_demo(title = "Demo App",
+                                                                          geometry = [1500, 700],
+                                                                          folder = self.folder_combo_box.get()))
+        app_button.pack(side = "right")
 
 
         ############## dashboard zone ##############
@@ -213,8 +223,11 @@ class Report_page(customtkinter.CTkFrame):
         canvas_width = canvas_element.winfo_width()
         ratio = min(canvas_height / image_import.height,
                     canvas_width / image_import.width)
+        print(f"ratio = {ratio}")
         new_width = int(image_import.width * ratio)
+        print(f"new_width = {new_width}")
         new_height = int(image_import.height * ratio)
+        print(f"new_height = {new_height}")
 
         # ปรับขนาดของภาพ
         resized_image = image_import.resize((new_width, new_height),
@@ -229,26 +242,33 @@ class Report_page(customtkinter.CTkFrame):
 
     # ฟังก์ชันโชว์รูปภาพแบบเต็มจอ
     def full_screen_image(self, image_import : object, title_name : str):
-        top_level = customtkinter.CTkToplevel()
+        top_level = tkinter.Toplevel()
+        top_level.geometry("500x500")
         top_level.title(f"{title_name}")
-        top_level.geometry("600x600")
         top_level.after(ms = 250, 
                         func = lambda : top_level.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
 
-        self.background_image_copy = image_import.copy()
-        background_image = ImageTk.PhotoImage(image_import)
-
+        self.im_copy = image_import.copy()
+        image_import = image_import.resize((top_level.winfo_width(), 
+                                            top_level.winfo_height()))
+        image_tk = ImageTk.PhotoImage(image_import)
+        
         self.background = tkinter.Label(master = top_level,
-                                         image = background_image)
+                                        image = image_tk)
         self.background.pack(expand = True,
-                              fill = "both")
-        self.background.bind("<Configure>", func = self._resize_image)
+                         fill = "both",
+                         side = "top",
+                         padx = 10,
+                         pady = 10)
 
-    def _resize_image(self, event):
+        self.background.image = image_tk
+        top_level.bind("<Configure>", func = lambda event : self.responsive_resize(event = event))
+
+
+    def responsive_resize(self, event):
         new_width = event.width
         new_height = event.height
-        
-        resize_image = self.background_image_copy.resize((new_width, new_height))
-
-        background_image = ImageTk.PhotoImage(image = resize_image)
-        self.background.configure(image = background_image)
+        resize_image = self.im_copy.resize((new_width, new_height))
+        final_image = ImageTk.PhotoImage(image = resize_image)
+        self.background.configure(image = final_image)
+        self.background.image = final_image
