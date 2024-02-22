@@ -3,8 +3,8 @@ import tkinter
 from tkinter import ttk
 from PIL import Image, ImageTk
 import os, shutil
+import cv2
 from app_demo import Main_demo
-
 
 class Report_page(customtkinter.CTkFrame):
     def __init__(self, parent):
@@ -53,8 +53,7 @@ class Report_page(customtkinter.CTkFrame):
         app_button = customtkinter.CTkButton(master = select_zone,
                                              text =  "Try it out!",
                                              font = ("Calibri Bold", 15),
-                                             command = lambda : Main_demo(title = "Demo App",
-                                                                          geometry = [1500, 700],
+                                             command = lambda : Main_demo(parent = self,
                                                                           folder = self.folder_combo_box.get()))
         app_button.pack(side = "right")
 
@@ -272,3 +271,85 @@ class Report_page(customtkinter.CTkFrame):
         final_image = ImageTk.PhotoImage(image = resize_image)
         self.background.configure(image = final_image)
         self.background.image = final_image
+
+
+# ## Demo App
+# class Main_demo(tkinter.Toplevel):
+#     def __init__(self, title : str, geometry : list|tuple, folder : str, parent : object):
+#         # สืบทอดทุก method ของ customtkinter.CTk ทั้งหมด
+#         super().__init__(master = parent)
+
+#         self.folder = folder
+#         self.title(string = title)
+#         self.geometry(f"{geometry[0]}x{geometry[1]}")
+#         self.resizable(width = False, height = False)
+#         self.columnconfigure(index = 0, weight = 5)
+#         self.columnconfigure(index = 1, weight = 95)
+
+
+#         menu_tab = Menu_tab(parent = self)
+#         menu_tab.pack(side = "left",
+#                       fill = "both")
+#         cap  = cv2.VideoCapture(0)
+#         self.video_area = tkinter.Canvas(master = self, 
+#                                          bg = "red")
+#         self.video_area.pack(side = "left",
+#                              fill = "both",
+#                              expand = True)
+#         self.video_area.update()
+
+#         print(f"Video Area = {self.video_area.winfo_height()}")
+#         print(f"Video Area = {self.video_area.winfo_width()}")
+
+#         self.count = 0 
+#         print("test")
+#         print()
+#         self.show_video(cap = cap)
+#         print(f"test end")
+
+
+
+#     def show_video(self, cap):
+
+#         # self.video_area.clear
+
+#         self.video_area.delete("all")
+#         ret, frame = cap.read()
+
+
+#         if ret:
+            
+#             img_fromarray = Image.fromarray(cv2.cvtColor(src = frame,
+#                                                          code = cv2.COLOR_BGR2RGB))
+#             convert_image = self.resize_image_to_canvas_ratio(image_from_array = img_fromarray)
+#             self.video_area.create_image(0,
+#                                         0,
+#                                         image = convert_image,
+#                                         anchor = tkinter.NW)
+#             self.video_area.update()
+#             print("test")
+
+#             # self.count += 1
+#             # print(f"self.count = {self.count}")
+#             # for i in self.video_area.children:
+#             #     print(i)
+
+
+#             # self.video_area.create_rectangle(boxes[0][0], boxes[0][1], boxes[0][2], boxes[0][3])
+#             # self.video_area.convert_image = convert_image
+#         self.after(ms = 15, func = lambda: self.show_video(cap = cap))
+        
+
+
+#     def resize_image_to_canvas_ratio(self, image_from_array):
+#         canvas_height = self.video_area.winfo_height()
+#         canvas_width = self.video_area.winfo_width()
+#         ratio = min(canvas_height / image_from_array.height, canvas_width / image_from_array.width)
+
+#         # ปรับขนาดของภาพ
+#         resized_image = image_from_array.resize((canvas_width, canvas_height), Image.BICUBIC)
+        
+#         final_image = ImageTk.PhotoImage(resized_image)
+
+#         del canvas_height, canvas_width, ratio
+#         return final_image
