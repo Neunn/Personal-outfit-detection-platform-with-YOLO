@@ -4,7 +4,6 @@ from tkinter import ttk
 # from PIL import Image, ImageTk
 # from tkinter import filedialog as fd
 import os, shutil
-# import patoolib
 import yaml
 import numpy as np
 from ultralytics import YOLO
