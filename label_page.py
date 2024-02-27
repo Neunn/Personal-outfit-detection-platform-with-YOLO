@@ -254,13 +254,12 @@ class Label_page(customtkinter.CTkFrame):
         print(self.combo_box.get())
         print("")
         # เพิ่ม Image ใน 
-        for root, dirs, files in os.walk(self.combo_box.get()):
-            for file in files:
-                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                    if os.path.exists(path = f"{self.combo_box.get()}/{os.path.splitext(file)[0]}.txt"):
-                        self.tree_image_list.insert('', 'end', value = (file,"True"))
-                    else:
-                        self.tree_image_list.insert("", "end", values = (file, ""))
+        for i in os.listdir(f"{self.combo_box.get()}"):
+            if i.lower().endswith(('.png', '.jpg', '.jpeg')):
+                if os.path.exists(path = f"{self.combo_box.get()}/{os.path.splitext(i)[0]}.txt"):
+                    self.tree_image_list.insert('', 'end', value = (i,"True"))
+                else:
+                    self.tree_image_list.insert("", "end", values = (i, ""))
         
 
 
@@ -379,7 +378,7 @@ class Label_page(customtkinter.CTkFrame):
         """หน้าต่าง top level เวลาลาก box เสร็จ"""
 
         # setup
-        self.top = customtkinter.CTkToplevel()
+        self.top = customtkinter.CTkToplevel(master = self)
         self.top.after(250, lambda : self.top.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
         top_width = 300
         top_height = 200
@@ -414,6 +413,12 @@ class Label_page(customtkinter.CTkFrame):
                                                    fg_color = "white",
                                                    textvariable = self.entry_widget_var)
         self.entry_widget.pack(pady = 5)
+
+        enter_button = tkinter.ttk.Button(master = self.top,
+                                               text = "Enter",
+                                               command = lambda : self.insert_tag())
+        enter_button.pack(side = "top",
+                          padx = 5)
 
         self.check_yaml_file()
 
