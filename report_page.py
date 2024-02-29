@@ -3,7 +3,6 @@ import tkinter
 from tkinter import ttk
 from PIL import Image, ImageTk
 import os, shutil
-import cv2
 from app_demo import Main_demo
 
 class Report_page(customtkinter.CTkFrame):
@@ -15,8 +14,7 @@ class Report_page(customtkinter.CTkFrame):
         """
         ### แผนการทำงาน
         # 1. ต้องมีปุ่ม combobox สำหรับเลือก folder เพื่อโชว์ข้อมูลที่เทรนได้
-        # 2. หากไม่มีโฟลเดอร์ที่เทรนให้ขึ้น show Error
-        # 3. หากมีให้นำรูปหรือค่าต่างๆมาพล็อตเป็นกราฟต่างๆ สามารถเลื่อนดูได้
+        # 2. หากมีให้นำรูปหรือค่าต่างๆมาพล็อตเป็นกราฟต่างๆ สามารถเลื่อนดูได้
         
         ############## select zone ##############
         select_zone = customtkinter.CTkFrame(master = self,
@@ -73,9 +71,9 @@ class Report_page(customtkinter.CTkFrame):
         dashboard_zone.columnconfigure(index = 2, weight = 25)
         dashboard_zone.columnconfigure(index = 3, weight = 25)
         
-        self.label_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
+        self.F1_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
                                                height = 400)
-        self.label_canvas.grid(row = 0,
+        self.F1_canvas.grid(row = 0,
                           column = 0,
                           sticky = "WNE",
                           padx = 5,
@@ -142,7 +140,7 @@ class Report_page(customtkinter.CTkFrame):
         self.folder_combo_box.configure(values = folder_list)
     
     def show_graph(self):
-        self.label_canvas.delete("all")
+        self.F1_canvas.delete("all")
         self.p_curve_canvas.delete("all")
         self.pr_curve_canvas.delete("all")
         self.r_curve_canvas.delete("all")
@@ -150,7 +148,7 @@ class Report_page(customtkinter.CTkFrame):
         self.result_canvas.delete("all")
         self.pred_canvas.delete("all")
 
-        self.label_canvas.configure(bg = "white")
+        self.F1_canvas.configure(bg = "white")
         self.p_curve_canvas.configure(bg = "white")
         self.pr_curve_canvas.configure(bg = "white")
         self.r_curve_canvas.configure(bg = "white")
@@ -160,12 +158,12 @@ class Report_page(customtkinter.CTkFrame):
 
 
 
-        label_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/labels.jpg")
-        self.label_canvas.bind("<Button-1>",
-                               func = lambda event : self.full_screen_image(image_import=label_image,
-                                                                            title_name = f"labels.png"))
-        self.ratio_canvas(canvas_element = self.label_canvas,
-                          image_import = label_image)
+        F1_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/F1_curve.png")
+        self.F1_canvas.bind("<Button-1>",
+                               func = lambda event : self.full_screen_image(image_import=F1_image,
+                                                                            title_name = f"F1_curve.png"))
+        self.ratio_canvas(canvas_element = self.F1_canvas,
+                          image_import = F1_image)
                           
         
         p_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/P_curve.png")

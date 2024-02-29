@@ -7,7 +7,6 @@ from ultralytics import YOLO
 import pandas as pd
 import os
 import shutil
-# from ultralytics.utils.plotting import Annotator
 
 
 class Main_demo:
@@ -173,52 +172,7 @@ class Main_demo:
                     if i != "I001":
                         self.tree_view.set(i, "Count", 0)
 
-                # list(set(result_train[0].boxes.cls.tolist()))
-            
-            # df_train = pd.DataFrame({"Name" : name_aftertrain, "Count" : [].extend()})
-            
-
-
-            # if len(results_af[0].boxes.cls.tolist()) != 0:
-            #     for i in results_af[0].boxes.cls.tolist():
-
-            #         # for j in self.tree_view.get_children():
-            #         #     if name_aftertrain[int(i)] == self.tree_view.item(j)["values"][0]:
-                            
-            #         #         for k in results_af[0].boxes.cls.tolist():
-            #         #             if k == self.tree_view.item(j)["values"][0]:
-            #         #                 count += 1
-            #         #         self.tree_view.set(j, "Count", count)
-            #         #     else:
-            #         #         self.tree_view.set(j, "Count", self.tree_view.item(j)["values"][1])
-
-            # else:
-            #     for i in self.tree_view.get_children():
-            #         if i != "I001":
-            #             self.tree_view.set(i, "Count", 0)
-            
-            # if len(result_train[0].boxes.cls.tolist()) != 0:
-            #     for i in result_train[0].boxes.cls.tolist():
-            #         for j in self.tree_view.get_children():
-            #             print(f"j = {j}")
-            #             for value in self.tree_view.item(j)["values"]:
-            #                 print(f"self.tree_view.item(j) = {self.tree_view.item(j)}")
-            #                 if value == name_aftertrain[int(i)]:
-            #                     self.tree_view.item(j)["values"][1] = self.tree_view.item(j)["values"][1] + 1
-            #                     self.tree_view.set(j, "Count", self.tree_view.item(j)["values"][1])
-            #                 else:
-            #                     self.tree_view.item(j)["values"][1] = self.tree_view.item(j)["values"][1] 
-            #                     self.tree_view.set(j, "Count", self.tree_view.item(j)["values"][1])
-            
-            # else:
-            #     for i in self.tree_view.get_children():
-            #         for value in self.tree_view.item(i)["values"]:
-            #             print(f"self.tree_view.item(i) = {self.tree_view.item(i)}")
-            #             if value == name_aftertrain[int()]:
-            #                 self.tree_view.item(j)["values"][1] = 0
-
-            
-            
+                        
 
     
         ret, frame = cap.read()
