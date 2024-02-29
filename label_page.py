@@ -80,6 +80,18 @@ class Label_page(customtkinter.CTkFrame):
                                                  command = lambda : self.redo_event())
         go_back_button.pack(side = "left", padx = 5)
 
+        self.delete_folder_button = customtkinter.CTkButton(master = annotation_frame,
+                                                       fg_color = "transparent",
+                                                       bg_color = "transparent",
+                                                       image = ImageTk.PhotoImage(image = Image.open(fp = "Icon_image/bin.png"),
+                                                                                  size = (30, 30)),
+                                                        text = "",
+                                                        width = 40,
+                                                        height = 36,
+                                                        command = lambda : self.delete_folder_function())
+        self.delete_folder_button.pack(side = "left", padx = 5)
+        
+
 
         """
             Class Tag sub_frame_1
@@ -155,6 +167,10 @@ class Label_page(customtkinter.CTkFrame):
         self.tree_image_list["yscrollcommand"] = self.scrollbar.set
         self.tree_image_list.bind("<<TreeviewSelect>>",
                                   func = lambda event : self.select_image())
+        self.tree_image_list.bind("<Delete>",
+                                  func = lambda event : self.delete_image_function(event = event))
+        self.tree_image_list.bind("<BackSpace>",
+                                  func = lambda event : self.delete_image_function(event = event))
 
 
         # ตัวแปรสำหรับการลากเลือก
@@ -178,6 +194,47 @@ class Label_page(customtkinter.CTkFrame):
         self.image_zone.bind("<B1-Motion>", func = self.on_drag)
         self.image_zone.bind("<ButtonRelease-1>", func = self.on_release)
 
+
+    def delete_image_function(self, event):
+        # try:
+        self.tree_image_list.focus_set()
+        tree_id = self.tree_image_list.focus()
+        print(f"tree_id = {tree_id}")
+        message_bool = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
+                                                message = f"ท่านจะทำการลบรูปภาพนี้หรือไม่")
+        if message_bool == True:
+            self.image_zone.delete("all")
+            image_path = self.combo_box.get() + "/" + self.tree_image_list.item(item = tree_id)["values"][0]
+            if os.path.exists(path = f"{os.path.splitext(p = image_path)[0]}.txt"):
+                os.remove(path = f"{os.path.splitext(p = image_path)[0]}.txt")
+                os.remove(path = image_path)
+            else:
+                os.remove(path = image_path)
+            self.tree_image_list.delete(tree_id)
+            tkinter.messagebox.showinfo(title = "Complete",
+                                        message= "ทำการลบรูปภาพเสร็จสิ้น")
+        else:
+
+            pass
+        # except:
+        #     tkinter.messagebox.showerror(title = "Error",
+        #                                  message = "กรุณากดเลือกรูปที่ต้องการจะลบจากตารางก่อน")
+
+    def delete_folder_function(self):
+        if self.combo_box.get() == "Select":
+            tkinter.messagebox.showerror(title = "Error",
+                                         message = "กรุณาเลือกโฟลเดอร์ที่ท่านต้องการจะลบก่อน")
+            return None
+        else:
+            message_bool = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
+                                        message = f"คุณต้องการที่จะ ลบ โฟลเดอร์ {self.combo_box.get()} ใช่หรือไม่")
+            if message_bool == True:
+                shutil.rmtree(path = f"{self.combo_box.get()}")
+                tkinter.messagebox.showinfo(title = "Complete",
+                                            message = f"ทำการลบโฟลเดอร์ {self.combo_box.get()} เสร็จสิ้น")
+            else:
+                pass
+
     def redo_event(self):    
         message_bool = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
                                     message = "คุณต้องการที่จะ label รูปภาพนี้ใหม่ใช่หรือไม่?")
@@ -200,7 +257,7 @@ class Label_page(customtkinter.CTkFrame):
                                              message = "ยังไม่มีการสร้างไฟล์ label")
         else:
             pass
-
+    
     def hand_button_event(self):
         """ฟังก์ชันเช็ค ว่าเลือกเครื่องมือถูกไหม"""
         self.rectangle_bool = False
@@ -253,7 +310,8 @@ class Label_page(customtkinter.CTkFrame):
             self.tree_image_list.delete(item)
         print(self.combo_box.get())
         print("")
-        # เพิ่ม Image ใน 
+
+        # เพิ่ม Image ใน Treeview
         for i in os.listdir(f"{self.combo_box.get()}"):
             if i.lower().endswith(('.png', '.jpg', '.jpeg')):
                 if os.path.exists(path = f"{self.combo_box.get()}/{os.path.splitext(i)[0]}.txt"):

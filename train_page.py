@@ -210,34 +210,6 @@ class Train_page(customtkinter.CTkFrame):
                            sticky = "W",
                            padx = 10)
         
-        # all_image_count_label = customtkinter.CTkLabel(master = inside_frame,
-        #                                          text = "จำนวนรูปทั้งหมด : ",
-        #                                          font = ("Calibri light", 13))
-        # all_image_count_label.grid(row = 15,
-        #                      column = 0,
-        #                      sticky = "w",
-        #                      padx = 10)
-        # train_count_label = customtkinter.CTkLabel(master = inside_frame,
-        #                                            text = "จำนวนรูปที่ใช้ Train : ",
-        #                                            font = ("Calibri light", 13))
-        # train_count_label.grid(row = 16,
-        #                        column = 0,
-        #                        sticky = "w",
-        #                        padx = 10)
-        # valid_count_label = customtkinter.CTkLabel(master = inside_frame,
-        #                                            text = "จำนวนรูปที่ใช้ในการ Validate : ",
-        #                                            font = ("Calibri light", 13))
-        # valid_count_label.grid(row = 17,
-        #                        column = 0,
-        #                        sticky = "w",
-        #                        padx = 10)
-        # test_count_label = customtkinter.CTkLabel(master = inside_frame,
-        #                                           text = "จำนวนรูปที่ใช้ในการ Test : ",
-        #                                           font = ("Calibri light", 13))
-        # test_count_label.grid(row = 18,
-        #                       column = 0,
-        #                       sticky = "w",
-        #                       padx = 10)
 
         
 
@@ -245,8 +217,8 @@ class Train_page(customtkinter.CTkFrame):
         revert_button.bind("<Leave>", command = lambda event : revert_button.configure(fg_color = "red"))
         self.folder_combo_box.bind("<<ComboboxSelected>>", command = lambda event : self._show_info())
     
-    def _show_info(self):
-        pass
+    # def _show_info(self):
+    #     pass
     
         
     def train_button_func(self):

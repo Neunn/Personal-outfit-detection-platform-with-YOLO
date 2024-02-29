@@ -42,8 +42,7 @@ class Home_page(customtkinter.CTkFrame):
             # เพิ่ม text box ใน second_frame
         textbox = customtkinter.CTkTextbox(master = second_frame,
                                            font = ("Calibri Regular", 20),
-                                           corner_radius = 20,
-                                           border_width = 1
+                                           corner_radius = 20
                                            )
         textbox.pack(side = "top",
                      expand = True,
