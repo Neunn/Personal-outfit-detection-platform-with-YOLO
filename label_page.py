@@ -196,29 +196,29 @@ class Label_page(customtkinter.CTkFrame):
 
 
     def delete_image_function(self, event):
-        # try:
-        self.tree_image_list.focus_set()
-        tree_id = self.tree_image_list.focus()
-        print(f"tree_id = {tree_id}")
-        message_bool = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
-                                                message = f"ท่านจะทำการลบรูปภาพนี้หรือไม่")
-        if message_bool == True:
-            self.image_zone.delete("all")
-            image_path = self.combo_box.get() + "/" + self.tree_image_list.item(item = tree_id)["values"][0]
-            if os.path.exists(path = f"{os.path.splitext(p = image_path)[0]}.txt"):
-                os.remove(path = f"{os.path.splitext(p = image_path)[0]}.txt")
-                os.remove(path = image_path)
+        try:
+            self.tree_image_list.focus_set()
+            tree_id = self.tree_image_list.focus()
+            print(f"tree_id = {tree_id}")
+            message_bool = tkinter.messagebox.askyesno(title = "แจ้งเตือน",
+                                                    message = f"ท่านจะทำการลบรูปภาพนี้หรือไม่")
+            if message_bool == True:
+                self.image_zone.delete("all")
+                image_path = self.combo_box.get() + "/" + self.tree_image_list.item(item = tree_id)["values"][0]
+                if os.path.exists(path = f"{os.path.splitext(p = image_path)[0]}.txt"):
+                    os.remove(path = f"{os.path.splitext(p = image_path)[0]}.txt")
+                    os.remove(path = image_path)
+                else:
+                    os.remove(path = image_path)
+                self.tree_image_list.delete(tree_id)
+                tkinter.messagebox.showinfo(title = "Complete",
+                                            message= "ทำการลบรูปภาพเสร็จสิ้น")
             else:
-                os.remove(path = image_path)
-            self.tree_image_list.delete(tree_id)
-            tkinter.messagebox.showinfo(title = "Complete",
-                                        message= "ทำการลบรูปภาพเสร็จสิ้น")
-        else:
 
-            pass
-        # except:
-        #     tkinter.messagebox.showerror(title = "Error",
-        #                                  message = "กรุณากดเลือกรูปที่ต้องการจะลบจากตารางก่อน")
+                pass
+        except:
+            tkinter.messagebox.showerror(title = "Error",
+                                         message = "กรุณากดเลือกรูปที่ต้องการจะลบจากตารางก่อน")
 
     def delete_folder_function(self):
         if self.combo_box.get() == "Select":

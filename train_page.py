@@ -222,6 +222,11 @@ class Train_page(customtkinter.CTkFrame):
     
         
     def train_button_func(self):
+        self.show_info = tkinter.Toplevel(master = self)
+        self.show_info.title("คำเตือน")
+        self.show_info.geometry(newGeometry = "200x200")
+        self.show_info.resizable(False, False)
+        self.show_info.after(2500, func = lambda : self.show_info.iconbitmap("Icon_image/nds-website-favicon-color.ico"))
 
         train_percent = self.slider_train_test_variable.get()
         print(f"train_percent = {train_percent}")
@@ -318,7 +323,14 @@ class Train_page(customtkinter.CTkFrame):
     
 
     
-    def train_model(self, yaml_path, model_type, epochs, batch_size, project_path):
+    def train_model(self, yaml_path, model_type, epochs, batch_size, project_path):        
+        label_info = customtkinter.CTkLabel(master = self.show_info,
+                                            text = "กรุณาอย่าปิดโปรแกรม โปรแกรมกำลังทำงานอยู่ หากทำงานเสร็จหน้าต่างนี้จะปิดลงเอง",
+                                            font = ("Calibri bold", 20))
+        label_info.pack(side = "top",
+                        padx = 5,
+                        pady = 5)
+
         if os.path.exists(path = f"{self.folder_combo_box.get()}/{model_type}"):
             model = YOLO(model = f"{self.folder_combo_box.get()}/{model_type}")
             model.train(data = yaml_path, 
@@ -334,13 +346,18 @@ class Train_page(customtkinter.CTkFrame):
                         project = project_path)
             shutil.move(src = f"{model_type}", dst = f"{self.folder_combo_box.get()}/{model_type}")
 
+        self.show_info.destroy()
+
+        tkinter.messagebox.showinfo(title = "Complete",
+                                    message = "ทำการเทรนโมเดลสำเร็จแล้ว")
+
     
     def revert_button_func(self):
         shutil.rmtree(f"{self.folder_combo_box.get()}/train")
         shutil.rmtree(f"{self.folder_combo_box.get()}/test")
         shutil.rmtree(f"{self.folder_combo_box.get()}/valid")
         shutil.rmtree(f"{self.folder_combo_box.get()}/runs")
-        os.remove(path = f"{self.folder_combo_box.get()}/{self.model_combo_box.get()}")
+        # os.remove(path = f"{self.folder_combo_box.get()}/{self.model_combo_box.get()}")
         
         with open(file = f"{self.folder_combo_box.get()}/data.yaml", mode = "r") as read_file:
             data = yaml.safe_load(read_file)
@@ -349,6 +366,9 @@ class Train_page(customtkinter.CTkFrame):
             yaml.dump(data, write_file)
 
         del read_file, write_file, data
+
+        tkinter.messagebox.showinfo(title = "Complete",
+                                    message = "ทำการ Revert เสร็จสิ้น")
 
 
     def get_folder(self):
