@@ -1,10 +1,3 @@
-"""
-    Import Library
-    โดยส่วนนี้ Library ที่เราใช้เป็นหลักคือ customtkinter, tkinter เหตุผลที่ใช้ customtkinter เพราะว่ามันสามารถปรับแต่งได้เยอะยกตัวอย่างเช่น attribute corner_radius ที่สามารถปรับความมนของขอบได้
-    Library yaml สำหรับ อ่าน เขียน ไฟล์ .yaml
-    Library patoolib สำหรับแตกไฟล์จำพวก file .zip .rar
-    Library shutil ใช้สำหรับ remove tree file
-"""
 import customtkinter
 from PIL import Image
 from home_page import Home_page

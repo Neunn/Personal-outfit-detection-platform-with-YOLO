@@ -11,11 +11,6 @@ class Upload_page(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color = "white")
 
-        """
-        Content Inside
-        - เป็นกดปุ่มขึ้นมาแล้วให้ Upload File โดยไฟล์ที่อัปโหลดอาจจะเป็น
-        """
-
         # เป็นกรอบ Frame ภายใน โดย expand = True คือการขยาย widget ของเรา 
         inside_frame = customtkinter.CTkFrame(master = self,
                                               corner_radius = 20,
@@ -26,9 +21,7 @@ class Upload_page(customtkinter.CTkFrame):
                           expand = True,
                           fill = "both")
         
-        """
-        ปุ่ม upload โดยปุ่ม upload จะมี function หลักๆอยู่ คือ ฟังก์ชันที่จะทำให้ปุ่มนั้นเมื่อนำเมาส์ไปวางแล้วเปลี่ยนสีเป็นสีเป็นสีหนึ่งเมื่อนำเมาส์ออกแล้วสีจะเปลี่ยนกลับมาเป็นสีเดิม อีกฟังก์ชันนึงคือฟังก์ชันที่จะทำให้เวลากดปุ่มจะเด้งหน้าต่าง ให้เลือกอัปโหลดไฟล์ .zip, .rar
-        """
+
         self.upload_button = customtkinter.CTkButton(master = inside_frame,
                                                     text = "Open Your File .zip",
                                                     compound = "top",

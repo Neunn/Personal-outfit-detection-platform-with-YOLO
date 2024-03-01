@@ -1,11 +1,7 @@
 import customtkinter
 import tkinter
 from tkinter import ttk
-# from PIL import Image, ImageTk
-# from tkinter import filedialog as fd
-# import os, shutil
-# import patoolib
-# import yaml
+
 
 ### -> Home Page Class
 class Home_page(customtkinter.CTkFrame):
@@ -59,9 +55,9 @@ class Home_page(customtkinter.CTkFrame):
                     2. อัปโหลดข้อมูลของคุณในเมนู Upload (เป็นไฟล์ .zip, .rar)
 
                     3. ทำการ Label รูปภาพของคุณ โดยคุณสามารถกำหนด Class ได้
-                       (เมื่อกดปุ่มเทรนแล้วกรุณาอย่าปิดโปรแกรม)
 
                     4. ทำการ Train โมเดลของคุณโดยสามารถปรับพารามิเตอร์ได้
+                       (เมื่อกดปุ่มเทรนแล้วกรุณาอย่าปิดโปรแกรม)
 
                     5. ดูผลของโมเดลได้ที่เมนู Report และสามารถทดลองใช้โมเดลที่เรา Train มาได้
                  """
