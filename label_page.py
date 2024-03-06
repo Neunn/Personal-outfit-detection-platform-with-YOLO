@@ -100,7 +100,8 @@ class Label_page(customtkinter.CTkFrame):
                                              fg_color = "black")
         class_frame.pack(side = "top",
                          padx = 7,
-                         pady = 10)
+                         pady = 10,
+                         fill = "x")
         class_name_label = customtkinter.CTkLabel(master = class_frame,
                                                    font = ("Calibri Bold", 18),
                                                    text_color = "white",
@@ -113,9 +114,11 @@ class Label_page(customtkinter.CTkFrame):
         self.class_table.pack(side = "top",
                          padx = 5,
                          pady = 5,
-                         expand  = True)
+                         expand  = True,
+                         fill = "y")
         self.class_table.heading(column = "No.",
                             text = "No.")
+        # self.class_table.column(column = "No.",)
         self.class_table.heading(column = "Name",
                             text = "Name")
         

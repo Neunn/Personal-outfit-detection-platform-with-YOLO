@@ -1,9 +1,9 @@
 import customtkinter
 import tkinter
-from tkinter import ttk
-from PIL import Image, ImageTk
+# from tkinter import ttk
+from PIL import Image
 from tkinter import filedialog as fd
-import os, shutil
+import os
 import patoolib
 # import yaml
 

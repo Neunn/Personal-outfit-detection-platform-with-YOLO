@@ -1,6 +1,4 @@
 import customtkinter
-import tkinter
-from tkinter import ttk
 
 
 ### -> Home Page Class

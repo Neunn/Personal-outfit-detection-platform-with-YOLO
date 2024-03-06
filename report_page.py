@@ -1,8 +1,7 @@
 import customtkinter
 import tkinter
-from tkinter import ttk
 from PIL import Image, ImageTk
-import os, shutil
+import os
 from app_demo import Main_demo
 
 class Report_page(customtkinter.CTkFrame):

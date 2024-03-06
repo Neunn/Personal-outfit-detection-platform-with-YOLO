@@ -67,6 +67,47 @@ class Main_demo:
                                             show = "headings")
             self.tree_view.pack(fill = "both",
                         expand = True)
+            
+            ### แจ้งเตือน Icon
+            icon_frame = customtkinter.CTkFrame(master =  log_tab.tab(name = "Log Tab"))
+            icon_frame.pack(fill = "both",
+                            expand = True,
+                             pady = 10)
+            
+            self.cross_sign_button = customtkinter.CTkButton(master = icon_frame,
+                                                        image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/close.png")),
+                                                        text = "",
+                                                        compound = "top",
+                                                        hover = False,
+                                                        fg_color = "transparent")
+            self.cross_sign_button.pack(pady = 5,
+                                   expand = "true",
+                                   fill = "both",
+                                   side = "top")
+            
+            self.check_sign_button = customtkinter.CTkButton(master = icon_frame,
+                                                        image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/check.png")),
+                                                        text = "",
+                                                        compound = "top",
+                                                        fg_color = "transparent",
+                                                        hover = False)
+            self.check_sign_button.pack(pady = 5,
+                                   expand = "true",
+                                   fill = "both",
+                                   side = "top")
+            
+            self.none_sign_button = customtkinter.CTkButton(master = icon_frame,
+                                                       image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/question-mark.png")),
+                                                       text = "",
+                                                       compound = "top",
+                                                       fg_color = "transparent",
+                                                       hover = False)
+            self.none_sign_button.pack(pady = 5,
+                                  expand = "true",
+                                  fill = "both",
+                                  side = "top")
+
+
             self.tree_view.heading("Name.", 
                             text = "Name")
             self.tree_view.heading("Count", 
@@ -84,7 +125,7 @@ class Main_demo:
                                                        text = "Get this model! (+ Pretrain_model)",
                                                        font = ("Calibri bold", 16),
                                                        command = lambda : self.get_model_to_desktop(folder = folder))
-            get_model_button.pack(side = "top",
+            get_model_button.pack(side = "top", 
                                   fill = "x",
                                   padx = 5,
                                   pady = 5)
@@ -114,6 +155,7 @@ class Main_demo:
             tkinter.messagebox.showerror(title = "Error",
                                          message = "กรุณาเลือกโฟลเดอร์ที่ต้องการก่อน")
             pass
+
         
     def get_model_to_desktop(self, folder):
         desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
@@ -130,9 +172,6 @@ class Main_demo:
                                     message = "ทำการโหลดโมเดลของท่านเสร็จสิ้น (บน desktop)")
 
     def show_video(self, canvas : object, cap : object, master : object, model_pretrain : object, model_aftertrain : object):
-
-
-
         def update_table(dataframe : object, result_pretrain : object, result_train : object, model_pretrain : object, model_aftertrain : object):
             
             name_pretrain = model_pretrain.names
@@ -172,9 +211,28 @@ class Main_demo:
                     if i != "I001":
                         self.tree_view.set(i, "Count", 0)
 
-                        
+        def change_icon(result_pretrain : object, result_train : object):
+            class_element_pretrain = result_pretrain[0].boxes.cls.tolist()
+            class_element_train = result_train[0].boxes.cls.tolist()
+            
+            print()
+            # print(f"class_element_pretrain = {class_element_pretrain}")
+            print(f"class_element_train = {class_element_train}")
+            # print(f"len(class_element_pretrain) = {len(class_element_pretrain)}")
+            print(f"len(class_element_train) = {len(class_element_train)}")
+            print()
 
-    
+            # if len(class_element_pretrain) == 0:
+            #     self.check_sign_button.configure(fg_color = "transparent")
+            #     self.cross_sign_button.configure(fg_color = "transparent")
+            #     self.none_sign_button.configure(fg_color = "light_color")
+                
+            # else:
+            #     self.check_sign_button.configure(fg_color = "light_color")
+            #     self.cross_sign_button.configure(fg_color = "light_color")
+            #     self.none_sign_button.configure(fg_color = "transparent")
+
+        
         ret, frame = cap.read()
 
         # ผ่าน blur
@@ -188,7 +246,9 @@ class Main_demo:
                                                         classes = [0])
 
             results_af = model_aftertrain.predict(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-
+            change_icon(result_pretrain = results,
+                        result_train = results_af)
+            
             names = model_pretrain.names
             names_af = model_aftertrain.names
 

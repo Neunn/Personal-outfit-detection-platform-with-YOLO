@@ -1,6 +1,6 @@
 # Import Library
 import customtkinter
-import tkinter
+# import tkinter
 
 
 
