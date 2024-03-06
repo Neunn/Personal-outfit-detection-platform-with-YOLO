@@ -78,8 +78,7 @@ class Main_demo:
                                                         image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/close.png")),
                                                         text = "",
                                                         compound = "top",
-                                                        hover = False,
-                                                        fg_color = "transparent")
+                                                        hover = False)
             self.cross_sign_button.pack(pady = 5,
                                    expand = "true",
                                    fill = "both",
@@ -89,7 +88,6 @@ class Main_demo:
                                                         image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/check.png")),
                                                         text = "",
                                                         compound = "top",
-                                                        fg_color = "transparent",
                                                         hover = False)
             self.check_sign_button.pack(pady = 5,
                                    expand = "true",
@@ -100,8 +98,8 @@ class Main_demo:
                                                        image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/question-mark.png")),
                                                        text = "",
                                                        compound = "top",
-                                                       fg_color = "transparent",
                                                        hover = False)
+            self.default_color = self.check_sign_button.cget("fg_color")
             self.none_sign_button.pack(pady = 5,
                                   expand = "true",
                                   fill = "both",
@@ -211,26 +209,57 @@ class Main_demo:
                     if i != "I001":
                         self.tree_view.set(i, "Count", 0)
 
-        def change_icon(result_pretrain : object, result_train : object):
+        def change_icon(result_pretrain : object, result_train : object, color : str, name_af_list : list):
             class_element_pretrain = result_pretrain[0].boxes.cls.tolist()
             class_element_train = result_train[0].boxes.cls.tolist()
             
             print()
             # print(f"class_element_pretrain = {class_element_pretrain}")
-            print(f"class_element_train = {class_element_train}")
-            # print(f"len(class_element_pretrain) = {len(class_element_pretrain)}")
-            print(f"len(class_element_train) = {len(class_element_train)}")
-            print()
+            # print(f"class_element_train = {class_element_train}")
+            # # print(f"len(class_element_pretrain) = {len(class_element_pretrain)}")
+            # print(f"len(class_element_train) = {len(class_element_train)}")
+            # print()
 
-            # if len(class_element_pretrain) == 0:
-            #     self.check_sign_button.configure(fg_color = "transparent")
-            #     self.cross_sign_button.configure(fg_color = "transparent")
-            #     self.none_sign_button.configure(fg_color = "light_color")
+            if len(class_element_pretrain) == 0:
+                self.check_sign_button.configure(fg_color = "transparent")
+                self.cross_sign_button.configure(fg_color = "transparent")
+                self.none_sign_button.configure(fg_color = color)
                 
-            # else:
-            #     self.check_sign_button.configure(fg_color = "light_color")
-            #     self.cross_sign_button.configure(fg_color = "light_color")
-            #     self.none_sign_button.configure(fg_color = "transparent")
+            else:
+                # self.check_sign_button.configure(fg_color = color)
+                # self.cross_sign_button.configure(fg_color = color)
+                # self.none_sign_button.configure(fg_color = "transparent")
+
+                class_element_train = [int(i) for i in class_element_train]
+                series_class_count = pd.DataFrame({"Class" : class_element_train}).value_counts("Class")
+                check_param = None
+                
+                for i, j in enumerate(series_class_count):
+                    # print(f"Class {series_class_count.index.tolist()[i]} = {j}")
+                    print(f"series_class_count.index.tolist() = {series_class_count.index.tolist()}, name_af_list = {[name_af_list.keys()]}")
+                    print(f"series_class_count.index.tolist() = {series_class_count.index.tolist()}, name_af_list = {[name_af_list.keys()]}")
+                    # if (len(class_element_pretrain) == j) and (series_class_count.index.tolist() == list(name_af_list.keys())):
+                    if (len(class_element_pretrain) == j) and (series_class_count.index.tolist() == list(name_af_list.keys())):
+                        check_param = True
+                    else:
+                        check_param = False
+                        break
+                
+                if check_param == True:
+                    self.check_sign_button.configure(fg_color = self.default_color)
+                    self.cross_sign_button.configure(fg_color = "transparent")
+                    self.none_sign_button.configure(fg_color = "transparent")
+                else:
+                    self.check_sign_button.configure(fg_color = "transparent")
+                    self.cross_sign_button.configure(fg_color = self.default_color)
+                    self.none_sign_button.configure(fg_color = "transparent")
+
+
+
+
+                # print(f"class_element_train = {class_element_train}")
+
+
 
         
         ret, frame = cap.read()
@@ -245,12 +274,17 @@ class Main_demo:
             results = model_pretrain.predict(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 
                                                         classes = [0])
 
+            # results_af = model_aftertrain.predict(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),
+            #                                       classes = [0])
+
             results_af = model_aftertrain.predict(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            change_icon(result_pretrain = results,
-                        result_train = results_af)
             
-            names = model_pretrain.names
+            # names = model_pretrain.names
             names_af = model_aftertrain.names
+            change_icon(result_pretrain = results,
+                        result_train = results_af,
+                        color = self.default_color,
+                        name_af_list = names_af)
 
             print(f"")
             print(f"results[0].boxes.xyxy.tolist() = {results[0].boxes.xyxy.tolist()}")
@@ -263,43 +297,47 @@ class Main_demo:
             
 
             if len(results_af[0].boxes.xyxy.tolist()) == 0:
-                zip_element = zip(results[0].boxes.xyxy.tolist(), 
-                                results[0].boxes.cls.tolist(), 
-                                results[0].boxes.conf.tolist())
-                for xyxy_pre, cls_pre, conf_pre  in zip_element:
+                # zip_element = zip(results[0].boxes.xyxy.tolist(), 
+                #                 results[0].boxes.cls.tolist(), 
+                #                 results[0].boxes.conf.tolist())
+                # for xyxy_pre, cls_pre, conf_pre  in zip_element:
 
-                    cv2.rectangle(img = frame, 
-                                pt1 = (int(xyxy_pre[0]), int(xyxy_pre[1])), 
-                                pt2 = (int(xyxy_pre[2]), int(xyxy_pre[3])), 
-                                color = (255,0,0),
-                                thickness = 2)
+                #     cv2.rectangle(img = frame, 
+                #                 pt1 = (int(xyxy_pre[0]), int(xyxy_pre[1])), 
+                #                 pt2 = (int(xyxy_pre[2]), int(xyxy_pre[3])), 
+                #                 color = (255,0,0),
+                #                 thickness = 2)
 
                     
 
-                    cv2.putText(img = frame,
-                                org = (int(xyxy_pre[0]), int(xyxy_pre[1])-5),
-                                text = f"class = {names[int(cls_pre)]}, prob = {round(conf_pre, 2)}",
-                                fontScale = 0.5,
-                                fontFace = cv2.FONT_HERSHEY_SIMPLEX,
-                                thickness = 1,
-                                color = (255, 0, 0))
-            
+                #     cv2.putText(img = frame,
+                #                 org = (int(xyxy_pre[0]), int(xyxy_pre[1])-5),
+                #                 text = f"class = {names[int(cls_pre)]}, prob = {round(conf_pre, 2)}",
+                #                 fontScale = 0.5,
+                #                 fontFace = cv2.FONT_HERSHEY_SIMPLEX,
+                #                 thickness = 1,
+                #                 color = (255, 0, 0))
+                pass
 
             else:
-                zip_element = zip(results[0].boxes.xyxy.tolist(), 
-                                results[0].boxes.cls.tolist(), 
-                                results[0].boxes.conf.tolist(), 
-                                results_af[0].boxes.xyxy.tolist(), 
+                zip_element = zip(results_af[0].boxes.xyxy.tolist(), 
                                 results_af[0].boxes.cls.tolist(), 
                                 results_af[0].boxes.conf.tolist())
+                # zip_element = zip(results[0].boxes.xyxy.tolist(), 
+                #                 results[0].boxes.cls.tolist(), 
+                #                 results[0].boxes.conf.tolist(), 
+                #                 results_af[0].boxes.xyxy.tolist(), 
+                #                 results_af[0].boxes.cls.tolist(), 
+                #                 results_af[0].boxes.conf.tolist())
                 
-                for xyxy_pre, cls_pre, conf_pre, xyxy_af, cls_af, conf_af  in zip_element:
+                # for xyxy_pre, cls_pre, conf_pre, xyxy_af, cls_af, conf_af  in zip_element:
+                for xyxy_af, cls_af, conf_af  in zip_element:
 
-                    cv2.rectangle(img = frame, 
-                                pt1 = (int(xyxy_pre[0]), int(xyxy_pre[1])), 
-                                pt2 = (int(xyxy_pre[2]), int(xyxy_pre[3])), 
-                                color = (255,0,0),
-                                thickness = 2)
+                    # cv2.rectangle(img = frame, 
+                    #             pt1 = (int(xyxy_pre[0]), int(xyxy_pre[1])), 
+                    #             pt2 = (int(xyxy_pre[2]), int(xyxy_pre[3])), 
+                    #             color = (255,0,0),
+                    #             thickness = 2)
                     cv2.rectangle(img = frame, 
                                 pt1 = (int(xyxy_af[0]), int(xyxy_af[1])), 
                                 pt2 = (int(xyxy_af[2]), int(xyxy_af[3])), 
@@ -307,13 +345,13 @@ class Main_demo:
                                 thickness = 2)
                     
 
-                    cv2.putText(img = frame,
-                                org = (int(xyxy_pre[0]), int(xyxy_pre[1])-5),
-                                text = f"class = {names[int(cls_pre)]}, prob = {round(conf_pre, 2)}",
-                                fontScale = 0.5,
-                                fontFace = cv2.FONT_HERSHEY_SIMPLEX,
-                                thickness = 1,
-                                color = (255, 0, 0))
+                    # cv2.putText(img = frame,
+                    #             org = (int(xyxy_pre[0]), int(xyxy_pre[1])-5),
+                    #             text = f"class = {names[int(cls_pre)]}, prob = {round(conf_pre, 2)}",
+                    #             fontScale = 0.5,
+                    #             fontFace = cv2.FONT_HERSHEY_SIMPLEX,
+                    #             thickness = 1,
+                    #             color = (255, 0, 0))
                     cv2.putText(img = frame,
                                 org = (int(xyxy_af[0]), int(xyxy_af[1])-5),
                                 text = f"class = {names_af[int(cls_af)]}, prob = {round(conf_af, 2)}",
