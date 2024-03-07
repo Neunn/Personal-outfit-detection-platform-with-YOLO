@@ -41,6 +41,7 @@ class Train_page(customtkinter.CTkFrame):
                          sticky = "N",
                          pady = 10)
 
+
         choose_model_label = customtkinter.CTkLabel(master = inside_frame, 
                                                     text = "Choose pretrained model",
                                                     font = ("Calibri Light", 16))

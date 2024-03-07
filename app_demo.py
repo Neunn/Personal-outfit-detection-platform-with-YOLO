@@ -14,7 +14,8 @@ class Main_demo:
         if folder != "Select":
             self.folder = folder
             cap = cv2.VideoCapture(0)
-            top_level = tkinter.Toplevel(master = parent)
+            top_level = tkinter.Toplevel(master = parent, 
+                                         background = "#D2DBE0")
             top_level.geometry(f"{round(cap.get(3) * 2.5)}x{round(cap.get(4) * 2)}")
             top_level.resizable(width = False,
                                 height = False)
@@ -49,12 +50,14 @@ class Main_demo:
             print(f"self.df.to_numpy().tolist() = {r_set}")
             print()
 
-            info_frame = customtkinter.CTkFrame(master = top_level)
+            info_frame = customtkinter.CTkFrame(master = top_level,
+                                                fg_color = "#39434b")
             info_frame.pack(side = "left",
                             fill = "both",
                             padx = 10,
                             pady = 10)
-            log_tab = customtkinter.CTkTabview(master = info_frame)
+            log_tab = customtkinter.CTkTabview(master = info_frame,
+                                               fg_color = "black")
             log_tab.pack(side = "top",
                         fill = "both",
                         padx = 5,
@@ -69,7 +72,8 @@ class Main_demo:
                         expand = True)
             
             ### แจ้งเตือน Icon
-            icon_frame = customtkinter.CTkFrame(master =  log_tab.tab(name = "Log Tab"))
+            icon_frame = customtkinter.CTkFrame(master =  log_tab.tab(name = "Log Tab"),
+                                                fg_color = "black")
             icon_frame.pack(fill = "both",
                             expand = True,
                              pady = 10)
@@ -82,7 +86,8 @@ class Main_demo:
             self.cross_sign_button.pack(pady = 5,
                                    expand = "true",
                                    fill = "both",
-                                   side = "top")
+                                   side = "top",
+                                   padx = 10)
             
             self.check_sign_button = customtkinter.CTkButton(master = icon_frame,
                                                         image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/check.png")),
@@ -92,7 +97,8 @@ class Main_demo:
             self.check_sign_button.pack(pady = 5,
                                    expand = "true",
                                    fill = "both",
-                                   side = "top")
+                                   side = "top",
+                                   padx = 10)
             
             self.none_sign_button = customtkinter.CTkButton(master = icon_frame,
                                                        image = ImageTk.PhotoImage(Image.open(fp = "Icon_image/question-mark.png")),
@@ -103,7 +109,8 @@ class Main_demo:
             self.none_sign_button.pack(pady = 5,
                                   expand = "true",
                                   fill = "both",
-                                  side = "top")
+                                  side = "top",
+                                  padx = 10)
 
 
             self.tree_view.heading("Name.", 
@@ -238,7 +245,7 @@ class Main_demo:
                     # print(f"Class {series_class_count.index.tolist()[i]} = {j}")
                     print(f"series_class_count.index.tolist() = {series_class_count.index.tolist()}, name_af_list = {[name_af_list.keys()]}")
                     print(f"series_class_count.index.tolist() = {series_class_count.index.tolist()}, name_af_list = {[name_af_list.keys()]}")
-                    # if (len(class_element_pretrain) == j) and (series_class_count.index.tolist() == list(name_af_list.keys())):
+                    # if (len(class_element_pretrain) == j) and (series_class_count.index.tolist() == [list(name_af_list.keys())[0]]):
                     if (len(class_element_pretrain) == j) and (series_class_count.index.tolist() == list(name_af_list.keys())):
                         check_param = True
                     else:
