@@ -65,66 +65,63 @@ class Report_page(customtkinter.CTkFrame):
                             pady = 5)
         
         ## setup column, row  : weight
-        dashboard_zone.columnconfigure(index = 0, weight = 25)
-        dashboard_zone.columnconfigure(index = 1, weight = 25)
-        dashboard_zone.columnconfigure(index = 2, weight = 25)
-        dashboard_zone.columnconfigure(index = 3, weight = 25)
+        dashboard_zone.columnconfigure(index = 0, weight = 50)
+        dashboard_zone.columnconfigure(index = 1, weight = 50)
+        # dashboard_zone.columnconfigure(index = 2, weight = 25)
+        # dashboard_zone.columnconfigure(index = 3, weight = 25)
         
         self.F1_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                               height = 400)
+                                               height = 700)
         self.F1_canvas.grid(row = 0,
                           column = 0,
-                          sticky = "WNE",
+                          sticky = "WNESES",
                           padx = 5,
                           pady = 5)
         
-        self.p_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                 height = 400)
-        self.p_curve_canvas.grid(row = 0, 
-                            column = 1,
-                            sticky = "WNE",
-                            padx = 5,
-                            pady = 5)
+        # self.p_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
+        #                                          height = 700)
+        # self.p_curve_canvas.grid(row = 0, 
+        #                     column = 1,
+        #                     sticky = "WNESE",
+        #                     padx = 5,
+        #                     pady = 5)
         
-        self.pr_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                 height = 400)
-        self.pr_curve_canvas.grid(row = 0, 
-                            column = 2,
-                            sticky = "WNE",
-                            padx = 5,
-                            pady = 5)
+        # self.pr_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
+        #                                          height = 700)
+        # self.pr_curve_canvas.grid(row = 0, 
+        #                     column = 2,
+        #                     sticky = "WNESE",
+        #                     padx = 5,
+        #                     pady = 5)
         
-        self.r_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                 height = 400)
-        self.r_curve_canvas.grid(row = 0, 
-                            column = 3,
-                            sticky = "WNE",
-                            padx = 5,
-                            pady = 5)
+        # self.r_curve_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
+        #                                          height = 700)
+        # self.r_curve_canvas.grid(row = 0, 
+        #                     column = 3,
+        #                     sticky = "WNESE",
+        #                     padx = 5,
+        #                     pady = 5)
         
         self.confusion_matrix_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                                          height = 700)
-        self.confusion_matrix_canvas.grid(row = 1,
-                                     column = 0,
-                                     columnspan = 2,
-                                     sticky = "WNE",
+                                                               height = 700)
+        self.confusion_matrix_canvas.grid(row = 0,
+                                     column = 1,
+                                     sticky = "WNES",
                                      padx = 5,
                                      pady = 5)
         
         self.result_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                               height = 700)
+                                                     height = 700)
         self.result_canvas.grid(row = 1, 
-                          column = 2,
-                          columnspan = 2,
-                          sticky = "WNE",
+                          column = 0,
+                          sticky = "WNES",
                           padx = 5,
                           pady = 5)
         
         self.pred_canvas = customtkinter.CTkCanvas(master = dashboard_zone,
-                                              height = 1000)
-        self.pred_canvas.grid(row = 2,
-                         column = 0,
-                         columnspan = 4,
+                                              height = 700)
+        self.pred_canvas.grid(row = 1,
+                         column = 1,
                          sticky = "WNES",
                          padx = 5,
                          pady = 5)
@@ -140,17 +137,17 @@ class Report_page(customtkinter.CTkFrame):
     
     def show_graph(self):
         self.F1_canvas.delete("all")
-        self.p_curve_canvas.delete("all")
-        self.pr_curve_canvas.delete("all")
-        self.r_curve_canvas.delete("all")
+        # self.p_curve_canvas.delete("all")
+        # self.pr_curve_canvas.delete("all")
+        # self.r_curve_canvas.delete("all")
         self.confusion_matrix_canvas.delete("all")
         self.result_canvas.delete("all")
         self.pred_canvas.delete("all")
 
         self.F1_canvas.configure(bg = "white")
-        self.p_curve_canvas.configure(bg = "white")
-        self.pr_curve_canvas.configure(bg = "white")
-        self.r_curve_canvas.configure(bg = "white")
+        # self.p_curve_canvas.configure(bg = "white")
+        # self.pr_curve_canvas.configure(bg = "white")
+        # self.r_curve_canvas.configure(bg = "white")
         self.confusion_matrix_canvas.configure(bg = "white")
         self.result_canvas.configure(bg = "white")
         self.pred_canvas.configure(bg = "white")
@@ -165,28 +162,28 @@ class Report_page(customtkinter.CTkFrame):
                           image_import = F1_image)
                           
         
-        p_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/P_curve.png")
-        self.p_curve_canvas.bind("<Button-1>",
-                                 func = lambda event : self.full_screen_image(image_import = p_curve_image,
-                                                                              title_name = f"P_curve.png"))
-        self.ratio_canvas(canvas_element = self.p_curve_canvas,
-                          image_import = p_curve_image)
+        # p_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/P_curve.png")
+        # self.p_curve_canvas.bind("<Button-1>",
+        #                          func = lambda event : self.full_screen_image(image_import = p_curve_image,
+        #                                                                       title_name = f"P_curve.png"))
+        # self.ratio_canvas(canvas_element = self.p_curve_canvas,
+        #                   image_import = p_curve_image)
         
 
-        pr_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/PR_curve.png")
-        self.pr_curve_canvas.bind("<Button-1>",
-                                  func = lambda event : self.full_screen_image(image_import = pr_curve_image,
-                                                                               title_name = f"PR_curve.png"))
-        self.ratio_canvas(canvas_element = self.pr_curve_canvas,
-                          image_import = pr_curve_image)
+        # pr_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/PR_curve.png")
+        # self.pr_curve_canvas.bind("<Button-1>",
+        #                           func = lambda event : self.full_screen_image(image_import = pr_curve_image,
+        #                                                                        title_name = f"PR_curve.png"))
+        # self.ratio_canvas(canvas_element = self.pr_curve_canvas,
+        #                   image_import = pr_curve_image)
         
 
-        r_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/R_curve.png")
-        self.r_curve_canvas.bind("<Button-1>",
-                                 func = lambda event : self.full_screen_image(image_import = r_curve_image,
-                                                                              title_name = f"R_curve.png"))
-        self.ratio_canvas(canvas_element = self.r_curve_canvas,
-                          image_import = r_curve_image)
+        # r_curve_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/R_curve.png")
+        # self.r_curve_canvas.bind("<Button-1>",
+        #                          func = lambda event : self.full_screen_image(image_import = r_curve_image,
+        #                                                                       title_name = f"R_curve.png"))
+        # self.ratio_canvas(canvas_element = self.r_curve_canvas,
+        #                   image_import = r_curve_image)
         
 
         confusion_matrix_image = Image.open(f"{self.folder_combo_box.get()}/runs/train/confusion_matrix.png")
